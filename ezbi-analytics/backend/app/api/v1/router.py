@@ -6,6 +6,7 @@ from app.api.v1.endpoints import (
     companies,
     financial_data,
     predictions,
+    data,
     file_uploads,
     analytics,
     integrations,
@@ -26,7 +27,8 @@ api_router.include_router(companies.router, prefix="/companies", tags=["Companie
 
 # Core features
 api_router.include_router(financial_data.router, prefix="/financial-data", tags=["Financial Data"])
-api_router.include_router(predictions.router, prefix="/predictions", tags=["Predictions"])
+api_router.include_router(predictions.router, prefix="/predictions", tags=["ML Predictions"])
+api_router.include_router(data.router, prefix="/data", tags=["Data Management"])
 api_router.include_router(file_uploads.router, prefix="/files", tags=["File Uploads"])
 api_router.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
 

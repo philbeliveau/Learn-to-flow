@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: ezbi-simple-postgres
+    environment:
+      POSTGRES_DB: ezbi_analytics
+      POSTGRES_USER: ezbi_user
+      POSTGRES_PASSWORD: ezbi_password_2024
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ezbi_user -d ezbi_analytics"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Simple Backend API
+  backend:
+    image: python:3.11-slim
+    container_name: ezbi-simple-backend
+    working_dir: /app
+    volumes:
+      - ./test-backend:/app
+    command: ["python", "server.py"]
+    ports:
+      - "8003:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy

@@ -1,0 +1,247 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: ezbi-test-postgres
+    environment:
+      POSTGRES_DB: ezbi_analytics
+      POSTGRES_USER: ezbi_user
+      POSTGRES_PASSWORD: ezbi_password_2024
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ezbi_user -d ezbi_analytics"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: ezbi-test-redis
+    command: redis-server --requirepass ezbi_redis_2024
+    ports:
+      - "6381:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API (Simple Python server for testing)
+  backend:
+    image: python:3.11-slim
+    container_name: ezbi-test-backend
+    working_dir: /app
+    command: >
+      bash -c "
+        pip install fastapi uvicorn python-multipart &&
+        cat > main.py << 'EOF' &&
+        from fastapi import FastAPI
+        from fastapi.middleware.cors import CORSMiddleware
+        import json
+        from datetime import datetime
+        
+        app = FastAPI(title='EZBI Analytics Test API')
+        
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=['*'],
+            allow_credentials=True,
+            allow_methods=['*'],
+            allow_headers=['*'],
+        )
+        
+        @app.get('/health')
+        def health():
+            return {'status': 'healthy', 'timestamp': datetime.now().isoformat()}
+        
+        @app.get('/')
+        def root():
+            return {'message': '🏭 EZBI Analytics Test API', 'status': 'running'}
+        
+        @app.post('/api/v1/auth/login')
+        def login(credentials: dict):
+            return {
+                'access_token': 'test_token_ezbi_2024',
+                'token_type': 'bearer',
+                'user': {
+                    'id': 1,
+                    'email': 'demo@ezbi.fr',
+                    'name': 'Jean Dupont'
+                }
+            }
+        
+        @app.post('/api/v1/predictions/cashflow')
+        def predict_cashflow(data: dict):
+            return {
+                'prediction': {
+                    'amount': 37500.0,
+                    'currency': 'EUR',
+                    'confidence': 0.87,
+                    'period_days': 30
+                },
+                'factors': {
+                    'seasonal_adjustment': 1.0,
+                    'base_daily_flow': 1250.0,
+                    'trend': 'stable'
+                },
+                'recommendations': [
+                    'Consider seasonal patterns in Q4',
+                    'Monitor supplier payment terms'
+                ]
+            }
+        
+        @app.get('/api/v1/company/kpis')
+        def get_kpis():
+            return {
+                'production': {
+                    'efficiency': 0.85,
+                    'capacity_utilization': 0.78,
+                    'units_produced': 1200,
+                    'defect_rate': 0.03
+                },
+                'financial': {
+                    'revenue_ytd': 1800000,
+                    'expenses_ytd': 1350000,
+                    'margin': 0.25,
+                    'cash_position': 450000,
+                    'currency': 'EUR'
+                }
+            }
+        EOF
+        uvicorn main:app --host 0.0.0.0 --port 8000
+      "
+    ports:
+      - "8002:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Frontend (Simple test version)
+  frontend-test:
+    image: node:18-alpine
+    container_name: ezbi-test-frontend
+    working_dir: /app
+    command: >
+      sh -c "
+        npm init -y &&
+        npm install express cors &&
+        cat > server.js << 'EOF' &&
+        const express = require('express');
+        const cors = require('cors');
+        const app = express();
+        
+        app.use(cors());
+        app.use(express.static('public'));
+        
+        app.get('/health', (req, res) => {
+          res.json({ status: 'healthy', service: 'frontend' });
+        });
+        
+        app.get('/', (req, res) => {
+          res.send(\`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>EZBI Analytics - Test Mode</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+                    .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                    h1 { color: #2563eb; }
+                    .status { background: #dcfce7; padding: 15px; border-radius: 6px; margin: 20px 0; }
+                    .api-test { background: #f3f4f6; padding: 15px; margin: 10px 0; border-radius: 6px; }
+                    button { background: #2563eb; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+                    button:hover { background: #1d4ed8; }
+                    #results { margin-top: 20px; padding: 15px; background: #fef3c7; border-radius: 6px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>🏭 EZBI Analytics Platform - Test Mode</h1>
+                    <div class="status">
+                        <h3>✅ System Status: RUNNING</h3>
+                        <p>Frontend: Active | Backend: Active | Database: Connected</p>
+                    </div>
+                    
+                    <h2>🧪 API Testing</h2>
+                    
+                    <div class="api-test">
+                        <h3>Authentication Test</h3>
+                        <button onclick="testLogin()">Test Login</button>
+                    </div>
+                    
+                    <div class="api-test">
+                        <h3>Cash Flow Prediction Test</h3>
+                        <button onclick="testPrediction()">Test ML Prediction</button>
+                    </div>
+                    
+                    <div class="api-test">
+                        <h3>Manufacturing KPIs Test</h3>
+                        <button onclick="testKPIs()">Test KPIs</button>
+                    </div>
+                    
+                    <div id="results"></div>
+                </div>
+                
+                <script>
+                const API_BASE = 'http://localhost:8002';
+                const results = document.getElementById('results');
+                
+                async function testLogin() {
+                    try {
+                        const response = await fetch(\\\`\\\${API_BASE}/api/v1/auth/login\\\`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: 'demo@ezbi.fr', password: 'demo123' })
+                        });
+                        const data = await response.json();
+                        results.innerHTML = '<h3>✅ Login Test Results:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                    } catch (error) {
+                        results.innerHTML = '<h3>❌ Login Test Error:</h3><pre>' + error.message + '</pre>';
+                    }
+                }
+                
+                async function testPrediction() {
+                    try {
+                        const response = await fetch(\\\`\\\${API_BASE}/api/v1/predictions/cashflow\\\`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ revenue: 150000, expenses: 112500, period_days: 30 })
+                        });
+                        const data = await response.json();
+                        results.innerHTML = '<h3>✅ ML Prediction Results:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                    } catch (error) {
+                        results.innerHTML = '<h3>❌ Prediction Test Error:</h3><pre>' + error.message + '</pre>';
+                    }
+                }
+                
+                async function testKPIs() {
+                    try {
+                        const response = await fetch(\\\`\\\${API_BASE}/api/v1/company/kpis\\\`);
+                        const data = await response.json();
+                        results.innerHTML = '<h3>✅ Manufacturing KPIs:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                    } catch (error) {
+                        results.innerHTML = '<h3>❌ KPIs Test Error:</h3><pre>' + error.message + '</pre>';
+                    }
+                }
+                </script>
+            </body>
+            </html>
+          \`);
+        });
+        
+        app.listen(3000, '0.0.0.0', () => {
+          console.log('EZBI Test Frontend running on port 3000');
+        });
+        EOF
+        node server.js
+      "
+    ports:
+      - "3002:3000"
+    depends_on:
+      - backend

@@ -1,0 +1,58 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node Exporter for system metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # FastAPI Backend
+  - job_name: 'ezbi-backend'
+    metrics_path: '/api/v1/metrics'
+    static_configs:
+      - targets: ['ezbi-backend:8000']
+    scrape_interval: 30s
+
+  # Next.js Frontend (if custom metrics endpoint added)
+  - job_name: 'ezbi-frontend'
+    metrics_path: '/api/metrics'
+    static_configs:
+      - targets: ['ezbi-frontend:3000']
+    scrape_interval: 30s
+
+  # PostgreSQL Exporter
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+
+  # Redis Exporter
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+
+  # Docker container metrics
+  - job_name: 'docker'
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: [__meta_docker_container_name]
+        regex: '/(.+)'
+        target_label: container_name
+        replacement: '${1}'

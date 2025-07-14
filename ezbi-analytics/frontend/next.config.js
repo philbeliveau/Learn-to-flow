@@ -7,17 +7,14 @@ const withPWA = require('next-pwa')({
   sw: 'sw.js',
   dynamicStartUrl: false,
   reloadOnOnline: true,
-  cacheOnFrontEndNav: true,
-  fallbacks: {
-    document: '/offline'
-  }
+  cacheOnFrontEndNav: true
 });
 
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   poweredByHeader: false,
-  output: 'standalone',
+  // output: 'standalone',
   
   experimental: {
     serverActions: {
@@ -59,12 +56,12 @@ const nextConfig = {
     ],
   },
   
-  // Internationalization
-  i18n: {
-    locales: ['fr', 'en'],
-    defaultLocale: 'fr',
-    localeDetection: false,
-  },
+  // // Internationalization
+  // i18n: {
+  //   locales: ['fr', 'en'],
+  //   defaultLocale: 'fr',
+  //   localeDetection: false,
+  // },
   async headers() {
     return [
       {
