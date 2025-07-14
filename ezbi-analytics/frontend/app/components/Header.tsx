@@ -1,4 +1,13 @@
+'use client';
+
 export default function Header() {
+  const scrollToLogin = () => {
+    const loginSection = document.getElementById('login-section');
+    if (loginSection) {
+      loginSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <header className="bg-black/90 backdrop-blur-lg border-b border-white/10 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
@@ -19,6 +28,12 @@ export default function Header() {
             <a href="#contact" className="text-gray-300 hover:text-white transition-colors">
               Contact
             </a>
+            <button 
+              onClick={scrollToLogin}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              Se connecter
+            </button>
           </nav>
         </div>
       </div>
