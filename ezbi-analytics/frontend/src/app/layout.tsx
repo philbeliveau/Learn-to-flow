@@ -12,9 +12,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'EZBI Analytics - Intelligence Manufacturière',
-  description: 'Plateforme d\'intelligence artificielle pour l\'optimisation des processus manufacturiers',
-  keywords: ['manufacturing', 'AI', 'analytics', 'industrie 4.0', 'prédiction'],
+  title: 'EZBI Analytics - Prédiction de Trésorerie IA',
+  description: 'Solution IA de prédiction de trésorerie pour les PME manufacturières françaises',
+  keywords: ['trésorerie', 'cash flow', 'prédiction', 'manufacturing', 'AI', 'analytics', 'industrie 4.0', 'PME', 'finance'],
   authors: [{ name: 'EZBI Analytics Team' }],
   creator: 'EZBI Analytics',
   publisher: 'EZBI Analytics',
@@ -32,8 +32,8 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'EZBI Analytics - Intelligence Manufacturière',
-    description: 'Plateforme d\'intelligence artificielle pour l\'optimisation des processus manufacturiers',
+    title: 'EZBI Analytics - Prédiction de Trésorerie IA',
+    description: 'Solution IA de prédiction de trésorerie pour les PME manufacturières françaises',
     url: 'https://ezbi-analytics.com',
     siteName: 'EZBI Analytics',
     images: [
@@ -49,8 +49,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'EZBI Analytics - Intelligence Manufacturière',
-    description: 'Plateforme d\'intelligence artificielle pour l\'optimisation des processus manufacturiers',
+    title: 'EZBI Analytics - Prédiction de Trésorerie IA',
+    description: 'Solution IA de prédiction de trésorerie pour les PME manufacturières françaises',
     images: ['/images/twitter-image.jpg'],
   },
   robots: {

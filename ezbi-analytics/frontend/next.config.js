@@ -14,19 +14,41 @@ const withPWA = require('next-pwa')({
 });
 
 const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  poweredByHeader: false,
+  output: 'standalone',
+  
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb'
-    }
+    },
+    optimizePackageImports: ['lucide-react', 'recharts'],
   },
-  webpack: (config) => {
+  
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': require('path').resolve(__dirname, 'src'),
     };
+    
+    // Bundle analyzer
+    if (process.env.ANALYZE === 'true') {
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+      config.plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'static',
+          openAnalyzer: false,
+        })
+      )
+    }
+    
     return config;
   },
+  
   images: {
+    domains: ['localhost', 'ezbi.fr'],
+    formats: ['image/webp', 'image/avif'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -35,6 +57,13 @@ const nextConfig = {
         pathname: '/uploads/**',
       },
     ],
+  },
+  
+  // Internationalization
+  i18n: {
+    locales: ['fr', 'en'],
+    defaultLocale: 'fr',
+    localeDetection: false,
   },
   async headers() {
     return [
@@ -61,7 +90,17 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:3001/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/:path*`,
+      },
+    ];
+  },
+  
+  async redirects() {
+    return [
+      {
+        source: '/dashboard',
+        destination: '/dashboard/overview',
+        permanent: true,
       },
     ];
   },

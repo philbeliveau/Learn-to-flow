@@ -23,8 +23,8 @@ RUN groupadd -r ezbi && useradd -r -g ezbi ezbi
 WORKDIR /app
 
 # Copy requirements and install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements-basic.txt .
+RUN pip install --no-cache-dir -r requirements-basic.txt
 
 # Development stage
 FROM base as development

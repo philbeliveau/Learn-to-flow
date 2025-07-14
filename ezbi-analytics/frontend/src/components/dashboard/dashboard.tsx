@@ -21,7 +21,11 @@ import {
   Database,
   Target
 } from 'lucide-react';
-import { useAuthStore, useDashboardStore, usePredictionStore, useDataStore, useUIStore } from '@/store';
+import { useAuthStore } from '@/store/auth-store';
+import { useDashboardStore } from '@/store/dashboard-store';
+import { usePredictionStore } from '@/store/prediction-store';
+import { useDataStore } from '@/store/data-store';
+import { useUIStore } from '@/store/ui-store';
 import { cn } from '@/lib/utils';
 import { PredictionCard } from '@/components/ui/prediction-card';
 import { SmartUploadZone } from '@/components/ui/smart-upload-zone';
@@ -56,9 +60,9 @@ const mockPredictions = [
     features: {},
     explanation: {
       topFeatures: [
-        { feature: 'Température', importance: 0.8, direction: 'positive' },
-        { feature: 'Pression', importance: 0.6, direction: 'negative' },
-        { feature: 'Humidité', importance: 0.4, direction: 'positive' }
+        { feature: 'Température', importance: 0.8, direction: 'positive' as const },
+        { feature: 'Pression', importance: 0.6, direction: 'negative' as const },
+        { feature: 'Humidité', importance: 0.4, direction: 'positive' as const }
       ],
       reasoning: 'La température optimale et l\'humidité stable indiquent une qualité élevée'
     }
@@ -78,6 +82,14 @@ const mockPredictions = [
     timestamp: new Date(Date.now() - 3600000),
     processingTime: 287,
     features: {},
+    explanation: {
+      topFeatures: [
+        { feature: 'Vibrations', importance: 0.9, direction: 'negative' as const },
+        { feature: 'Heures fonctionnement', importance: 0.7, direction: 'negative' as const },
+        { feature: 'Température moteur', importance: 0.5, direction: 'negative' as const }
+      ],
+      reasoning: 'Vibrations anormales et heures d\'utilisation élevées indiquent une maintenance prochaine'
+    }
   },
   {
     id: '3',
@@ -94,6 +106,14 @@ const mockPredictions = [
     timestamp: new Date(Date.now() - 7200000),
     processingTime: 92,
     features: {},
+    explanation: {
+      topFeatures: [
+        { feature: 'Débit', importance: 0.8, direction: 'positive' as const },
+        { feature: 'Pression', importance: 0.6, direction: 'positive' as const },
+        { feature: 'Température', importance: 0.4, direction: 'positive' as const }
+      ],
+      reasoning: 'Tous les paramètres sont dans les plages normales'
+    }
   }
 ];
 
@@ -131,7 +151,9 @@ export function Dashboard() {
   };
 
   const handlePredictionDetails = (prediction: any) => {
-    toast.info(`Détails de la prédiction: ${prediction.modelName}`);
+    toast(`Détails de la prédiction: ${prediction.modelName}`, {
+      icon: 'ℹ️',
+    });
   };
 
   const handlePredictionRerun = (predictionId: string) => {

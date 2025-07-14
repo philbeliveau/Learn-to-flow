@@ -254,7 +254,9 @@ export function LoginForm() {
               className="text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
               onClick={() => {
                 // Handle signup navigation
-                toast.info('Contactez votre administrateur pour créer un compte');
+                toast('Contactez votre administrateur pour créer un compte', {
+                  icon: 'ℹ️',
+                });
               }}
             >
               Contactez l'administrateur

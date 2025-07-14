@@ -26,9 +26,14 @@
       "@/hooks/*": ["./src/hooks/*"],
       "@/types/*": ["./src/types/*"],
       "@/store/*": ["./src/store/*"],
+      "@/stores/*": ["./src/stores/*"],
       "@/utils/*": ["./src/utils/*"],
-      "@/locales/*": ["./src/locales/*"]
-    }
+      "@/locales/*": ["./src/locales/*"],
+      "@/styles/*": ["./src/styles/*"],
+      "@/public/*": ["./public/*"]
+    },
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

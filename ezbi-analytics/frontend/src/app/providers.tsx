@@ -1,9 +1,10 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { IntlProvider } from 'react-intl';
-import { useUIStore } from '@/store';
-import { useAuthStore } from '@/store';
+import { useUIStore } from '@/store/ui-store';
+import { useAuthStore } from '@/store/auth-store';
 
 // Import locale messages
 import messagesEn from '@/locales/en.json';
@@ -20,7 +21,36 @@ interface ProvidersProps {
 
 export function Providers({ children }: ProvidersProps) {
   const { language } = useUIStore();
-  const { refreshToken } = useAuthStore();
+  const { refreshTokenAction } = useAuthStore();
+  
+  // Create Query Client
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000, // 1 minute
+            refetchOnWindowFocus: false,
+            retry: (failureCount, error: any) => {
+              // Don't retry on authentication errors
+              if (error?.status === 401 || error?.status === 403) {
+                return false;
+              }
+              return failureCount < 3;
+            },
+          },
+          mutations: {
+            retry: (failureCount, error: any) => {
+              // Don't retry on authentication or validation errors
+              if (error?.status === 401 || error?.status === 403 || error?.status === 422) {
+                return false;
+              }
+              return failureCount < 2;
+            },
+          },
+        },
+      })
+  );
 
   // Auto-refresh token on app start
   useEffect(() => {
@@ -29,13 +59,13 @@ export function Providers({ children }: ProvidersProps) {
       try {
         const authData = JSON.parse(token);
         if (authData.state.refreshToken) {
-          refreshToken();
+          refreshTokenAction();
         }
       } catch (error) {
         console.error('Failed to parse auth token:', error);
       }
     }
-  }, [refreshToken]);
+  }, [refreshTokenAction]);
 
   // Register service worker
   useEffect(() => {
@@ -68,12 +98,14 @@ export function Providers({ children }: ProvidersProps) {
   }, []);
 
   return (
-    <IntlProvider
-      locale={language}
-      messages={messages[language]}
-      defaultLocale="fr"
-    >
-      {children}
-    </IntlProvider>
+    <QueryClientProvider client={queryClient}>
+      <IntlProvider
+        locale={language}
+        messages={messages[language]}
+        defaultLocale="fr"
+      >
+        {children}
+      </IntlProvider>
+    </QueryClientProvider>
   );
 }
