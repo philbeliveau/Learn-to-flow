@@ -20,7 +20,7 @@ export default function Contact() {
               
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1" style={{backgroundColor: '#74a6be'}}>
                     <span className="text-white text-sm">📧</span>
                   </div>
                   <div>
@@ -31,7 +31,7 @@ export default function Contact() {
                 </div>
                 
                 <div className="flex items-start gap-4">
-                  <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1" style={{backgroundColor: '#a7292e'}}>
                     <span className="text-white text-sm">📱</span>
                   </div>
                   <div>
@@ -42,7 +42,7 @@ export default function Contact() {
                 </div>
                 
                 <div className="flex items-start gap-4">
-                  <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1" style={{backgroundColor: '#74a6be'}}>
                     <span className="text-white text-sm">🏢</span>
                   </div>
                   <div>
@@ -53,13 +53,13 @@ export default function Contact() {
                 </div>
               </div>
               
-              <div className="mt-8 p-6 bg-gradient-to-br from-blue-900/30 to-purple-900/30 backdrop-blur-lg rounded-xl border border-blue-500/30">
+              <div className="mt-8 p-6 backdrop-blur-lg rounded-xl border" style={{backgroundColor: 'rgba(116, 166, 190, 0.1)', borderColor: '#74a6be'}}>
                 <h4 className="text-white font-bold mb-3">🎯 Audit gratuit</h4>
                 <p className="text-gray-300 text-sm mb-4">
                   Nous analysons gratuitement vos données sur 30 jours pour identifier 
                   vos opportunités d'optimisation.
                 </p>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                <button className="text-white px-6 py-2 rounded-lg font-medium transition-colors" style={{backgroundColor: '#74a6be'}}>
                   Demander un audit
                 </button>
               </div>
@@ -78,7 +78,8 @@ export default function Contact() {
                     </label>
                     <input
                       type="text"
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 text-white"
+                      style={{'--tw-ring-color': '#74a6be'}}
                       placeholder="Votre PME manufacturière"
                     />
                   </div>
@@ -89,7 +90,8 @@ export default function Contact() {
                     </label>
                     <input
                       type="email"
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 text-white"
+                      style={{'--tw-ring-color': '#74a6be'}}
                       placeholder="dirigeant@votrepme.fr"
                     />
                   </div>
@@ -113,14 +115,16 @@ export default function Contact() {
                     </label>
                     <textarea
                       rows={4}
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 text-white"
+                      style={{'--tw-ring-color': '#74a6be'}}
                       placeholder="Décrivez votre problématique de trésorerie ou production..."
                     ></textarea>
                   </div>
                   
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-all transform hover:scale-105"
+                    className="w-full text-white px-6 py-3 rounded-lg font-medium transition-all transform hover:scale-105"
+                    style={{backgroundColor: '#a7292e'}}
                   >
                     Envoyer ma demande
                   </button>

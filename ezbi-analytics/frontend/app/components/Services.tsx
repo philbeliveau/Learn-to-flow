@@ -4,62 +4,183 @@ export default function Services() {
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-8">
-              Nos solutions IA
+            <h2 className="text-4xl md:text-5xl font-light text-white mb-8 tracking-tight">
+              Notre méthode en 3 étapes
             </h2>
-            <p className="text-xl text-gray-300">
-              Intelligence manufacturière alimentée par l'IA pour une gestion proactive
+            <p className="text-xl font-light text-white/70 max-w-3xl mx-auto leading-relaxed">
+              On transforme vos données éparses en intelligence d'affaires actionnable.
+              Progressivement, sans déranger vos opérations.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-gradient-to-br from-blue-900/50 to-purple-900/50 backdrop-blur-lg rounded-xl p-8 border border-blue-500/30">
-              <div className="text-5xl mb-6">💰</div>
-              <h3 className="text-2xl font-bold text-blue-400 mb-4">
-                Cash Flow Radar
-              </h3>
-              <p className="text-gray-300 mb-6">
-                Prédiction de trésorerie avec IA (Prophet + LSTM) basée sur 
-                218K+ enregistrements réels de PME manufacturières.
-              </p>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>✓ Précision 87% sur 30 jours</li>
-                <li>✓ Intégration données production</li>
-                <li>✓ Alertes proactives</li>
-              </ul>
+          <div className="space-y-12">
+            {/* Step 1 */}
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 text-white font-light text-2xl flex items-center justify-center" style={{backgroundColor: '#a7292e'}}>
+                    1
+                  </div>
+                  <h3 className="text-3xl font-light text-white">
+                    Surveillance de base
+                  </h3>
+                </div>
+                <p className="text-lg font-light text-white/70 mb-6 leading-relaxed">
+                  On connecte vos systèmes existants (QuickBooks, Excel, CRM) et on met en place 
+                  des alertes automatiques dans Slack.
+                </p>
+                <ul className="space-y-3 text-white/60 font-light">
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2" style={{backgroundColor: '#a7292e'}}></div>
+                    Alerte si compte en banque &lt; 30 jours d'opérations
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2" style={{backgroundColor: '#a7292e'}}></div>
+                    Notification factures impayées &gt; 60 jours
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2" style={{backgroundColor: '#a7292e'}}></div>
+                    Surveillance ventes hebdomadaires vs objectifs
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-black border border-white/20 p-6">
+                <div className="bg-black border border-white/20 p-4 mb-4">
+                  <p className="text-sm font-light" style={{color: '#74a6be'}}>#finance-alerts</p>
+                </div>
+                <div className="space-y-3">
+                  <div className="bg-white border-l-4 p-3" style={{borderLeftColor: '#a7292e'}}>
+                    <p className="text-black text-sm font-light">
+                      🚨 Cash flow: 23 jours restants
+                    </p>
+                  </div>
+                  <div className="bg-white border-l-4 p-3" style={{borderLeftColor: '#74a6be'}}>
+                    <p className="text-black text-sm font-light">
+                      ⚠️ Facture ABC Corp: 45 jours de retard
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-            
-            <div className="bg-gradient-to-br from-green-900/50 to-teal-900/50 backdrop-blur-lg rounded-xl p-8 border border-green-500/30">
-              <div className="text-5xl mb-6">📊</div>
-              <h3 className="text-2xl font-bold text-green-400 mb-4">
-                Manufacturing Intelligence
-              </h3>
-              <p className="text-gray-300 mb-6">
-                KPIs temps réel de production, qualité, efficacité avec 
-                corrélations automatiques entre process et finance.
-              </p>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>✓ 100+ capteurs IoT</li>
-                <li>✓ 5 machines surveillées</li>
-                <li>✓ Optimisation continue</li>
-              </ul>
+
+            {/* Step 2 */}
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="order-2 md:order-1">
+                <div className="bg-black border border-white/20 p-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-black border border-white/20 p-4 text-center">
+                      <p className="text-2xl font-light text-white">87%</p>
+                      <p className="text-sm text-white/60">Précision 30j</p>
+                    </div>
+                    <div className="bg-black border border-white/20 p-4 text-center">
+                      <p className="text-2xl font-light" style={{color: '#a7292e'}}>-15k$</p>
+                      <p className="text-sm text-white/60">Prédit dans 7j</p>
+                    </div>
+                    <div className="bg-black border border-white/20 p-4 text-center">
+                      <p className="text-2xl font-light" style={{color: '#74a6be'}}>+23%</p>
+                      <p className="text-sm text-white/60">Opp. détectées</p>
+                    </div>
+                    <div className="bg-black border border-white/20 p-4 text-center">
+                      <p className="text-2xl font-light" style={{color: '#74a6be'}}>42j</p>
+                      <p className="text-sm text-white/60">Délai moyen</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="order-1 md:order-2">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 text-white font-light text-2xl flex items-center justify-center" style={{backgroundColor: '#a7292e'}}>
+                    2
+                  </div>
+                  <h3 className="text-3xl font-light text-white">
+                    Prédictions intelligentes
+                  </h3>
+                </div>
+                <p className="text-lg font-light text-white/70 mb-6 leading-relaxed">
+                  On ajoute l'IA pour prédire votre cash flow, identifier les patterns de ventes 
+                  et anticiper les problèmes avant qu'ils arrivent.
+                </p>
+                <ul className="space-y-3 text-white/60 font-light">
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2" style={{backgroundColor: '#a7292e'}}></div>
+                    Prédiction cash flow 30/60/90 jours
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2" style={{backgroundColor: '#a7292e'}}></div>
+                    Probabilité de conversion des prospects
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2" style={{backgroundColor: '#a7292e'}}></div>
+                    Détection automatique d'anomalies
+                  </li>
+                </ul>
+              </div>
             </div>
-            
-            <div className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 backdrop-blur-lg rounded-xl p-8 border border-purple-500/30">
-              <div className="text-5xl mb-6">🤖</div>
-              <h3 className="text-2xl font-bold text-purple-400 mb-4">
-                Early Warning System
-              </h3>
-              <p className="text-gray-300 mb-6">
-                Détection précoce des risques financiers et opérationnels 
-                avec recommandations d'actions correctives.
-              </p>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>✓ Alertes intelligentes</li>
-                <li>✓ Scénarios prédictifs</li>
-                <li>✓ Plans d'action automatisés</li>
-              </ul>
+
+            {/* Step 3 */}
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 text-white font-light text-2xl flex items-center justify-center" style={{backgroundColor: '#a7292e'}}>
+                    3
+                  </div>
+                  <h3 className="text-3xl font-light text-white">
+                    Optimisation continue
+                  </h3>
+                </div>
+                <p className="text-lg font-light text-white/70 mb-6 leading-relaxed">
+                  On intègre tous vos processus pour une vue 360°. Le système apprend de vos 
+                  décisions et s'améliore automatiquement.
+                </p>
+                <ul className="space-y-3 text-white/60 font-light">
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2" style={{backgroundColor: '#a7292e'}}></div>
+                    Recommandations d'actions spécifiques
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2" style={{backgroundColor: '#a7292e'}}></div>
+                    Optimisation automatique des processus
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2" style={{backgroundColor: '#a7292e'}}></div>
+                    Tableau de bord exécutif temps réel
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-black border border-white/20 p-6">
+                <div className="space-y-4">
+                  <div className="bg-white border-l-4 p-3" style={{borderLeftColor: '#74a6be'}}>
+                    <p className="text-black text-sm font-light">
+                      💡 <strong>RECOMMANDATION:</strong> Relancer client XYZ avant vendredi
+                    </p>
+                  </div>
+                  <div className="bg-white border-l-4 p-3" style={{borderLeftColor: '#74a6be'}}>
+                    <p className="text-black text-sm font-light">
+                      ✅ <strong>ACTION:</strong> Crédit fournisseur négocié (+15 jours)
+                    </p>
+                  </div>
+                  <div className="bg-white border-l-4 p-3" style={{borderLeftColor: '#a7292e'}}>
+                    <p className="text-black text-sm font-light">
+                      🎯 <strong>OPTIMISATION:</strong> Process commandes +12% plus rapide
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="text-center mt-16">
+            <p className="text-xl font-light text-white/70 mb-8">
+              Chaque étape vous donne de la valeur immédiate.
+            </p>
+            <a
+              href="#pricing"
+              className="inline-block text-white px-8 py-4 font-light transition-all hover:scale-105"
+              style={{backgroundColor: '#a7292e'}}
+            >
+              Voir les prix et commencer
+            </a>
           </div>
         </div>
       </div>
