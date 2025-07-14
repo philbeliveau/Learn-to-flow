@@ -43,33 +43,43 @@ export default function LoginSection({ onLogin, apiStatus }: LoginSectionProps) 
   };
 
   return (
-    <section id="login-section" className="py-20 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-800">
+    <section id="login-section" className="py-20 bg-black">
       <div className="container mx-auto px-4">
-        <div className="max-w-md mx-auto bg-white/10 backdrop-blur-lg rounded-xl p-8 border border-white/20">
-          {/* API Status */}
-          <div className="flex items-center gap-2 mb-6">
-            <div className={`w-3 h-3 rounded-full ${
-              apiStatus === 'online' ? 'bg-green-500' : 
-              apiStatus === 'offline' ? 'bg-red-500' : 
-              'bg-yellow-500 animate-pulse'
-            }`}></div>
-            <span className="text-sm font-medium text-white">
-              API: {apiStatus === 'online' ? 'En ligne' : 
-                   apiStatus === 'offline' ? 'Hors ligne' : 
-                   'Vérification...'}
-            </span>
+        <div className="max-w-md mx-auto bg-black border border-white/20 p-8">
+          {/* EZBI Logo */}
+          <div className="text-center mb-8">
+            <div className="flex justify-center items-center gap-1 mb-4">
+              <span className="text-4xl font-light" style={{color: '#74a6be'}}>E</span>
+              <span className="text-4xl font-light" style={{color: '#74a6be'}}>Z</span>
+              <span className="text-4xl font-light" style={{color: '#a7292e'}}>B</span>
+              <span className="text-4xl font-light" style={{color: '#a7292e'}}>I</span>
+            </div>
+            <h2 className="text-2xl font-light text-white">
+              Accès Analytics
+            </h2>
           </div>
 
-          <h2 className="text-2xl font-bold text-center mb-6 text-white">
-            Accès Plateforme EZBI
-          </h2>
+          {/* API Status */}
+          <div className="flex items-center gap-2 mb-6">
+            <div className={`w-2 h-2 rounded-full ${
+              apiStatus === 'online' ? 'bg-white' : 
+              apiStatus === 'offline' ? 'bg-white/30' : 
+              'bg-white/60 animate-pulse'
+            }`}></div>
+            <span className="text-sm font-light text-white/70">
+              {apiStatus === 'online' ? 'Système en ligne' : 
+               apiStatus === 'offline' ? 'Hors ligne' : 
+               'Vérification...'}
+            </span>
+          </div>
           
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-2 text-white/90">Email</label>
+              <label className="block text-sm font-light mb-2 text-white/70">Email</label>
               <input
                 type="email"
-                className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-white/60"
+                className="w-full px-4 py-4 bg-black border border-white/30 focus:border-white/60 text-white placeholder-white/40 font-light"
+                style={{backgroundColor: 'black'}}
                 value={loginData.email}
                 onChange={(e) => setLoginData({...loginData, email: e.target.value})}
                 placeholder="demo@ezbi.fr"
@@ -77,10 +87,11 @@ export default function LoginSection({ onLogin, apiStatus }: LoginSectionProps) 
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2 text-white/90">Mot de passe</label>
+              <label className="block text-sm font-light mb-2 text-white/70">Mot de passe</label>
               <input
                 type="password"
-                className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-white/60"
+                className="w-full px-4 py-4 bg-black border border-white/30 focus:border-white/60 text-white placeholder-white/40 font-light"
+                style={{backgroundColor: 'black'}}
                 value={loginData.password}
                 onChange={(e) => setLoginData({...loginData, password: e.target.value})}
                 placeholder="demo123"
@@ -90,25 +101,31 @@ export default function LoginSection({ onLogin, apiStatus }: LoginSectionProps) 
             <button 
               type="submit" 
               disabled={loading || apiStatus === 'offline'}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105"
+              className="w-full border border-white/30 hover:border-white/60 disabled:border-white/10 text-white px-6 py-4 font-light transition-all duration-300 hover:scale-105"
+              style={{backgroundColor: 'transparent'}}
             >
               {loading ? 'Connexion...' : 'Se connecter'}
             </button>
           </form>
 
-          <div className="mt-6 p-4 bg-blue-500/20 rounded-lg border border-blue-400/30">
-            <p className="text-sm text-blue-200">
-              <strong>Demo:</strong> demo@ezbi.fr / demo123
+          <div className="mt-8 border border-white/20 p-4">
+            <p className="text-sm font-light text-white/70">
+              <span className="text-white">Demo:</span> demo@ezbi.fr / demo123
             </p>
           </div>
 
           <div className="text-center mt-6">
             <a 
-              href="http://localhost:8003/docs" 
+              href="http://localhost:8004/docs" 
               target="_blank" 
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-block text-sm"
+              className="border border-white/30 hover:border-white/60 text-white px-4 py-2 font-light transition-colors inline-flex items-center gap-2"
+              style={{backgroundColor: 'transparent'}}
             >
-              📚 Documentation API
+              <svg className="w-4 h-4" style={{color: '#74a6be'}} fill="currentColor" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                <polyline points="14,2 14,8 20,8"/>
+              </svg>
+              <span>Documentation API</span>
             </a>
           </div>
         </div>
