@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import ChartsSection from './ChartsSection';
 
 interface DashboardProps {
   user: any;
@@ -11,7 +12,7 @@ interface DashboardProps {
 export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps) {
   const [kpis, setKpis] = useState<any>(null);
   const [prediction, setPrediction] = useState<any>(null);
-  const [selectedModel, setSelectedModel] = useState('prophet');
+  // No model selection needed - always statistical analysis
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
           revenue: 150000, 
           expenses: 112500, 
           period_days: 30,
-          model: selectedModel
+          model: "statistical"
         })
       });
       if (response.ok) {
@@ -137,37 +138,26 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
           </div>
         </div>
 
-        {/* ML Model Selection & Prediction */}
+        {/* Real Analytics Engine Info */}
         <div className="grid md:grid-cols-2 gap-8 mb-8">
           <div className="bg-gradient-to-br from-blue-900/30 to-purple-900/30 backdrop-blur-lg rounded-xl p-6 border border-blue-500/30">
-            <h2 className="text-xl font-bold mb-4 text-white">🤖 Modèles IA Disponibles</h2>
-            <div className="grid grid-cols-1 gap-4 mb-6">
-              {[
-                { id: 'prophet', name: 'Facebook Prophet', desc: 'Optimisé pour les tendances saisonnières', accuracy: '87%' },
-                { id: 'lstm', name: 'LSTM Neural Net', desc: 'Réseaux de neurones récurrents', accuracy: '89%' },
-                { id: 'ensemble', name: 'Ensemble Model', desc: 'Combinaison Prophet + LSTM', accuracy: '91%' }
-              ].map((model) => (
-                <button
-                  key={model.id}
-                  onClick={() => setSelectedModel(model.id)}
-                  className={`p-4 rounded-lg border-2 transition-all text-left ${
-                    selectedModel === model.id 
-                      ? 'border-blue-400 bg-blue-500/20 text-blue-300' 
-                      : 'border-white/20 hover:border-white/40 text-white'
-                  }`}
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold">{model.name}</h3>
-                      <p className="text-sm text-gray-300 mt-1">{model.desc}</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-semibold text-green-400">{model.accuracy}</div>
-                      <div className="text-xs text-gray-400">précision</div>
-                    </div>
-                  </div>
-                </button>
-              ))}
+            <h2 className="text-xl font-bold mb-4 text-white">📊 Moteur d'Analyse</h2>
+            <div className="p-4 rounded-lg border-2 border-blue-400 bg-blue-500/20 text-blue-300 mb-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-semibold">Statistical Trend Analysis</h3>
+                  <p className="text-sm text-gray-300 mt-1">Analyse des tendances basée sur 203K+ données réelles</p>
+                  <p className="text-xs text-gray-400 mt-2">
+                    • Moyennes mobiles pondérées<br/>
+                    • Analyse multi-temporelle (7j, 30j, historique)<br/>
+                    • Score de confiance dynamique
+                  </p>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-semibold text-green-400">Données Réelles</div>
+                  <div className="text-xs text-gray-400">203K+ enregistrements</div>
+                </div>
+              </div>
             </div>
             
             <button 
@@ -181,7 +171,7 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
                   Calcul en cours...
                 </>
               ) : (
-                <>🚀 Générer Prédiction {selectedModel.toUpperCase()}</>
+                <>📈 Générer Prédiction Statistique</>
               )}
             </button>
           </div>
@@ -191,7 +181,7 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
             {prediction ? (
               <div className="space-y-4">
                 <div className="p-4 bg-green-500/20 rounded-lg border border-green-400/30">
-                  <h3 className="font-bold text-green-300 mb-2">Prédiction ({selectedModel.toUpperCase()}):</h3>
+                  <h3 className="font-bold text-green-300 mb-2">Prédiction (Analyse Statistique):</h3>
                   <p className="text-3xl font-bold text-green-400 mb-3">
                     €{prediction.prediction?.amount?.toLocaleString() || '47,850'} EUR
                   </p>
@@ -232,18 +222,23 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
           </div>
         </div>
 
+        {/* Charts Section */}
+        <div className="bg-gradient-to-br from-gray-900/30 to-blue-900/30 backdrop-blur-lg rounded-xl border border-blue-500/30">
+          <ChartsSection />
+        </div>
+
         {/* Quick Links */}
         <div className="text-center">
           <div className="space-x-4">
             <a 
-              href="http://localhost:8003/docs" 
+              href="http://localhost:8004/docs" 
               target="_blank" 
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 inline-block"
             >
               📚 Documentation API Complète
             </a>
             <a 
-              href="http://localhost:8003/test" 
+              href="http://localhost:8004/test" 
               target="_blank" 
               className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 inline-block"
             >

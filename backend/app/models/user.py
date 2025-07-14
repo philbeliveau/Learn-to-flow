@@ -17,5 +17,5 @@ class User(BaseModel):
     # Foreign keys
     company_id = Column(String, ForeignKey("companies.id"), nullable=False)
     
-    # Relationships
-    company = relationship("Company", back_populates="users")
+    # Relationships (use string reference to avoid circular imports)
+    company = relationship("Company", back_populates="users", lazy="select")

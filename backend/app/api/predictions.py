@@ -24,7 +24,7 @@ class PredictionRequest(BaseModel):
     revenue: float
     expenses: float
     period_days: int = 30
-    model: str = "prophet"
+    model: str = "statistical"  # Always statistical analysis, no fake AI models
 
 class PredictionResponse(BaseModel):
     prediction: dict
@@ -64,9 +64,9 @@ async def generate_cashflow_prediction(
             target_date=(datetime.now() + timedelta(days=request.period_days)).date(),
             predicted_value=prediction_value,
             confidence_score=confidence,
-            model_type=request.model,
+            model_type="statistical_trend_analysis",
             model_version="1.0.0",
-            features_used=["historical_sales", "trend_analysis"],
+            features_used=["historical_cash_flow", "weighted_moving_averages", "trend_analysis"],
             model_metadata={
                 "input_revenue": request.revenue,
                 "input_expenses": request.expenses,
@@ -86,7 +86,7 @@ async def generate_cashflow_prediction(
                 "target_date": prediction_record.target_date.isoformat()
             },
             confidence=confidence,
-            model_type=request.model,
+            model_type="statistical_trend_analysis",
             generated_at=datetime.now().isoformat()
         )
         
