@@ -26,7 +26,7 @@ const nextConfig = {
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@': require('path').resolve(__dirname, 'src'),
+      '@': require('path').resolve(__dirname, 'app'),
     };
     
     // Bundle analyzer
@@ -93,13 +93,7 @@ const nextConfig = {
   },
   
   async redirects() {
-    return [
-      {
-        source: '/dashboard',
-        destination: '/dashboard/overview',
-        permanent: true,
-      },
-    ];
+    return [];
   },
 };
 
