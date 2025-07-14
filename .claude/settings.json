@@ -79,6 +79,35 @@
         "CLAUDE_FLOW_REMOTE_READY": "true",
         "CLAUDE_FLOW_GITHUB_INTEGRATION": "true"
       }
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-postgres"
+      ],
+      "env": {
+        "DATABASE_URL": "${DATABASE_URL}"
+      }
+    },
+    "jira": {
+      "command": "npx",
+      "args": [
+        "@chinchillaenterprises/mcp-jira"
+      ],
+      "env": {
+        "JIRA_URL": "${JIRA_URL}",
+        "JIRA_USERNAME": "${JIRA_USERNAME}",
+        "JIRA_API_TOKEN": "${JIRA_API_KEY}"
+      }
     }
   },
   "includeCoAuthoredBy": true,

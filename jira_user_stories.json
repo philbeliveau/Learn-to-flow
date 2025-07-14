@@ -1,0 +1,655 @@
+{
+  "project": "CPG",
+  "epics": [
+    {
+      "key": "EPIC-1",
+      "summary": "Authentication & User Management",
+      "description": "As a PME manufacturing company, I need a secure authentication system to access my cash flow prediction platform.",
+      "labels": ["authentication", "security", "user-management"],
+      "priority": "High",
+      "stories": [
+        {
+          "summary": "User Registration for Manufacturing Companies",
+          "description": "As a manufacturing company owner, I want to register my company on EZBI Analytics so that I can access AI-powered cash flow predictions.",
+          "acceptance_criteria": [
+            "Company registration form with business details",
+            "Industry sector selection (metallurgie, agroalimentaire, automobile, etc.)",
+            "Email verification process",
+            "Password strength validation",
+            "GDPR compliance consent"
+          ],
+          "technical_requirements": [
+            "JWT authentication with refresh tokens",
+            "PostgreSQL user/company models",
+            "BCrypt password hashing",
+            "Email verification service",
+            "Rate limiting on registration"
+          ],
+          "story_points": 8,
+          "priority": "High",
+          "labels": ["registration", "authentication", "gdpr"]
+        },
+        {
+          "summary": "Secure Login System",
+          "description": "As a registered user, I want to login securely to my dashboard so that I can access my prediction data safely.",
+          "acceptance_criteria": [
+            "Email/password authentication",
+            "Multi-factor authentication option",
+            "Session management",
+            "Remember me functionality",
+            "Account lockout after failed attempts"
+          ],
+          "technical_requirements": [
+            "FastAPI JWT authentication",
+            "Redis session storage",
+            "TOTP-based MFA",
+            "Security audit logging"
+          ],
+          "story_points": 5,
+          "priority": "High",
+          "labels": ["login", "security", "mfa"]
+        }
+      ]
+    },
+    {
+      "key": "EPIC-2",
+      "summary": "Smart Data Upload & Processing",
+      "description": "As a user, I need to upload my financial data easily and have it processed intelligently by AI.",
+      "labels": ["data-upload", "ai-processing", "file-handling"],
+      "priority": "High",
+      "stories": [
+        {
+          "summary": "Smart Upload Zone with AI Analysis",
+          "description": "As a user, I want to upload Excel/CSV files with drag-and-drop so that the AI can analyze my financial data structure.",
+          "acceptance_criteria": [
+            "Drag-and-drop file upload interface",
+            "Support for .xlsx, .xls, .csv formats",
+            "File size validation (max 10MB)",
+            "Real-time upload progress",
+            "AI-powered column detection"
+          ],
+          "technical_requirements": [
+            "Next.js file upload component",
+            "Pandas data analysis",
+            "Column mapping AI algorithm",
+            "File validation service",
+            "S3 file storage"
+          ],
+          "story_points": 13,
+          "priority": "High",
+          "labels": ["upload", "ai", "file-processing"]
+        },
+        {
+          "summary": "Intelligent Data Analysis and Validation",
+          "description": "As a user, I want to see AI analysis of my uploaded data so that I understand data quality and completeness.",
+          "acceptance_criteria": [
+            "Automatic detection of date, amount, client columns",
+            "Data quality scoring (0-100%)",
+            "Missing data identification",
+            "Recommendations for data improvement",
+            "Data preview with detected structure"
+          ],
+          "technical_requirements": [
+            "Manufacturing-specific data patterns",
+            "ML-based column classification",
+            "Data quality metrics calculation",
+            "Validation rules engine"
+          ],
+          "story_points": 8,
+          "priority": "High",
+          "labels": ["data-analysis", "validation", "quality"]
+        }
+      ]
+    },
+    {
+      "key": "EPIC-3",
+      "summary": "ML Prediction Engine",
+      "description": "As a manufacturing company, I need accurate cash flow predictions using advanced AI models.",
+      "labels": ["machine-learning", "predictions", "ai-models"],
+      "priority": "Critical",
+      "stories": [
+        {
+          "summary": "Prophet Model for Seasonal Predictions",
+          "description": "As a user, I want to generate seasonal cash flow predictions so that I can plan for manufacturing cycles.",
+          "acceptance_criteria": [
+            "Prophet model trained on manufacturing data",
+            "Seasonal pattern recognition",
+            "French holiday calendar integration",
+            "Quarterly business cycle support",
+            "Manufacturing-specific seasonality"
+          ],
+          "technical_requirements": [
+            "Prophet model with manufacturing customizations",
+            "Holiday calendar integration",
+            "Quarterly seasonality components",
+            "Industry-specific parameters"
+          ],
+          "story_points": 13,
+          "priority": "Critical",
+          "labels": ["prophet", "seasonality", "manufacturing"]
+        },
+        {
+          "summary": "LSTM Deep Learning Model",
+          "description": "As a user, I want advanced neural network predictions so that I get high accuracy for complex patterns.",
+          "acceptance_criteria": [
+            "LSTM model with attention mechanism",
+            "Sequence learning from historical data",
+            "Uncertainty estimation",
+            "Real-time inference",
+            "Model performance monitoring"
+          ],
+          "technical_requirements": [
+            "PyTorch LSTM implementation",
+            "Attention mechanism",
+            "CUDA GPU acceleration",
+            "Model versioning system"
+          ],
+          "story_points": 21,
+          "priority": "Critical",
+          "labels": ["lstm", "deep-learning", "attention"]
+        },
+        {
+          "summary": "Ensemble Model Combination",
+          "description": "As a user, I want to combine multiple AI models so that I get the most accurate predictions possible.",
+          "acceptance_criteria": [
+            "Intelligent model weighting",
+            "Prophet + LSTM + classical models",
+            "Confidence interval calculation",
+            "Model performance tracking",
+            "Adaptive weight adjustment"
+          ],
+          "technical_requirements": [
+            "Ensemble learning framework",
+            "Dynamic weight calculation",
+            "Performance-based model selection",
+            "Cross-validation system"
+          ],
+          "story_points": 13,
+          "priority": "High",
+          "labels": ["ensemble", "model-combination", "accuracy"]
+        }
+      ]
+    },
+    {
+      "key": "EPIC-4",
+      "summary": "Prediction Dashboard",
+      "description": "As a user, I need an intuitive dashboard to visualize and understand my cash flow predictions.",
+      "labels": ["dashboard", "visualization", "ui-ux"],
+      "priority": "High",
+      "stories": [
+        {
+          "summary": "Interactive Prediction Visualization",
+          "description": "As a user, I want to see my cash flow predictions as interactive charts so that I can understand future trends visually.",
+          "acceptance_criteria": [
+            "Interactive line charts with zoom/pan",
+            "Historical vs predicted data overlay",
+            "Confidence interval visualization",
+            "Multiple time horizon options",
+            "Export to PDF/PNG functionality"
+          ],
+          "technical_requirements": [
+            "Recharts/D3.js visualization",
+            "Responsive chart design",
+            "Real-time data updates",
+            "Chart export functionality"
+          ],
+          "story_points": 8,
+          "priority": "High",
+          "labels": ["charts", "visualization", "export"]
+        },
+        {
+          "summary": "Confidence Indicators and Model Accuracy",
+          "description": "As a user, I want to see confidence levels for each prediction so that I can assess prediction reliability.",
+          "acceptance_criteria": [
+            "Visual confidence indicators (high/medium/low)",
+            "Color-coded confidence levels",
+            "Percentage confidence display",
+            "Model accuracy history",
+            "Uncertainty explanations"
+          ],
+          "technical_requirements": [
+            "Confidence calculation algorithms",
+            "Visual indicator components",
+            "Model accuracy tracking",
+            "Performance metrics display"
+          ],
+          "story_points": 5,
+          "priority": "Medium",
+          "labels": ["confidence", "accuracy", "indicators"]
+        },
+        {
+          "summary": "AI-Generated Business Insights",
+          "description": "As a user, I want to receive AI-generated business insights so that I can make informed financial decisions.",
+          "acceptance_criteria": [
+            "Automated insight generation",
+            "Trend analysis explanations",
+            "Risk period identification",
+            "Seasonal pattern insights",
+            "Actionable recommendations"
+          ],
+          "technical_requirements": [
+            "Natural language generation",
+            "Pattern recognition algorithms",
+            "Business rule engine",
+            "Insight ranking system"
+          ],
+          "story_points": 13,
+          "priority": "High",
+          "labels": ["insights", "nlg", "recommendations"]
+        }
+      ]
+    },
+    {
+      "key": "EPIC-5",
+      "summary": "Analytics & Reporting",
+      "description": "As a user, I need comprehensive analytics to understand my business performance.",
+      "labels": ["analytics", "reporting", "kpi"],
+      "priority": "Medium",
+      "stories": [
+        {
+          "summary": "KPI Dashboard with Business Metrics",
+          "description": "As a user, I want to see key performance indicators so that I can track my business health.",
+          "acceptance_criteria": [
+            "Revenue, expenses, cash flow KPIs",
+            "Period-over-period comparisons",
+            "Visual trend indicators",
+            "Customizable time periods",
+            "Export capabilities"
+          ],
+          "technical_requirements": [
+            "KPI calculation engine",
+            "Trend analysis algorithms",
+            "Responsive dashboard layout",
+            "Data aggregation services"
+          ],
+          "story_points": 8,
+          "priority": "Medium",
+          "labels": ["kpi", "metrics", "dashboard"]
+        },
+        {
+          "summary": "Client Segmentation with RFM Analysis",
+          "description": "As a user, I want to see client analysis using RFM methodology so that I can understand customer behavior.",
+          "acceptance_criteria": [
+            "RFM score calculation",
+            "Client segment visualization",
+            "Recency, Frequency, Monetary analysis",
+            "Client ranking and categorization",
+            "Segment-based insights"
+          ],
+          "technical_requirements": [
+            "RFM calculation algorithm",
+            "Client segmentation logic",
+            "Visualization components",
+            "Data aggregation services"
+          ],
+          "story_points": 13,
+          "priority": "Medium",
+          "labels": ["rfm", "segmentation", "clients"]
+        }
+      ]
+    },
+    {
+      "key": "EPIC-6",
+      "summary": "Integration Ecosystem",
+      "description": "As a user, I need EZBI to integrate with my existing tools and systems.",
+      "labels": ["integrations", "api", "ecosystem"],
+      "priority": "High",
+      "stories": [
+        {
+          "summary": "ERP System Integration",
+          "description": "As a user, I want to connect EZBI with my ERP system so that data flows automatically.",
+          "acceptance_criteria": [
+            "Sage, SAP, Odoo connector support",
+            "Automatic data synchronization",
+            "Mapping configuration interface",
+            "Real-time data updates",
+            "Error handling and retry logic"
+          ],
+          "technical_requirements": [
+            "ERP API connectors",
+            "Data mapping engine",
+            "Synchronization scheduler",
+            "Error handling system"
+          ],
+          "story_points": 21,
+          "priority": "High",
+          "labels": ["erp", "sage", "sap", "odoo"]
+        },
+        {
+          "summary": "Slack Notification Integration",
+          "description": "As a user, I want to receive prediction alerts in Slack so that my team stays informed.",
+          "acceptance_criteria": [
+            "Slack webhook integration",
+            "Customizable alert triggers",
+            "Rich message formatting",
+            "Alert frequency settings",
+            "Team channel notifications"
+          ],
+          "technical_requirements": [
+            "Slack API integration",
+            "Webhook management",
+            "Message formatting",
+            "Alert scheduling system"
+          ],
+          "story_points": 5,
+          "priority": "Medium",
+          "labels": ["slack", "notifications", "alerts"]
+        },
+        {
+          "summary": "Open Banking Integration",
+          "description": "As a user, I want to connect my bank accounts via Open Banking so that real-time transaction data improves predictions.",
+          "acceptance_criteria": [
+            "Open Banking PSD2 compliance",
+            "Bank account connection flow",
+            "Real-time transaction import",
+            "Data categorization",
+            "Security and encryption"
+          ],
+          "technical_requirements": [
+            "Open Banking API integration",
+            "OAuth2 authentication",
+            "Transaction categorization ML",
+            "Encryption at rest/transit"
+          ],
+          "story_points": 21,
+          "priority": "Medium",
+          "labels": ["banking", "psd2", "open-banking"]
+        }
+      ]
+    },
+    {
+      "key": "EPIC-7",
+      "summary": "Mobile & Responsive Experience",
+      "description": "As a user, I need EZBI to work seamlessly on all devices.",
+      "labels": ["mobile", "responsive", "pwa"],
+      "priority": "Medium",
+      "stories": [
+        {
+          "summary": "Mobile-Responsive Dashboard",
+          "description": "As a user, I want to access my dashboard on mobile devices so that I can check predictions on-the-go.",
+          "acceptance_criteria": [
+            "Responsive design for mobile/tablet",
+            "Touch-friendly interface",
+            "Offline capability for key data",
+            "Fast loading times",
+            "Native app-like experience"
+          ],
+          "technical_requirements": [
+            "Progressive Web App (PWA)",
+            "Responsive CSS framework",
+            "Service worker for offline",
+            "Mobile-optimized components"
+          ],
+          "story_points": 13,
+          "priority": "Medium",
+          "labels": ["mobile", "responsive", "pwa"]
+        },
+        {
+          "summary": "Mobile Push Notifications",
+          "description": "As a user, I want to receive push notifications so that I'm alerted to important predictions.",
+          "acceptance_criteria": [
+            "Push notification setup",
+            "Customizable alert preferences",
+            "Critical alert prioritization",
+            "Battery-efficient notifications",
+            "Cross-platform compatibility"
+          ],
+          "technical_requirements": [
+            "Push notification service",
+            "Service worker implementation",
+            "Notification scheduling",
+            "Cross-platform support"
+          ],
+          "story_points": 8,
+          "priority": "Low",
+          "labels": ["notifications", "push", "mobile"]
+        }
+      ]
+    },
+    {
+      "key": "EPIC-8",
+      "summary": "Security & Compliance",
+      "description": "As a user, I need EZBI to be secure and compliant with regulations.",
+      "labels": ["security", "compliance", "gdpr"],
+      "priority": "Critical",
+      "stories": [
+        {
+          "summary": "GDPR Compliance Implementation",
+          "description": "As a user, I want to have control over my data so that I comply with GDPR requirements.",
+          "acceptance_criteria": [
+            "Data export functionality",
+            "Data deletion capabilities",
+            "Consent management",
+            "Privacy policy integration",
+            "Audit trail logging"
+          ],
+          "technical_requirements": [
+            "GDPR compliance framework",
+            "Data export/import tools",
+            "Consent management system",
+            "Audit logging service"
+          ],
+          "story_points": 13,
+          "priority": "Critical",
+          "labels": ["gdpr", "privacy", "compliance"]
+        },
+        {
+          "summary": "Enterprise-Grade Data Encryption",
+          "description": "As a user, I want to have my financial data encrypted so that it's protected from unauthorized access.",
+          "acceptance_criteria": [
+            "End-to-end encryption",
+            "AES-256 encryption standards",
+            "Key management system",
+            "Encrypted data storage",
+            "Secure data transmission"
+          ],
+          "technical_requirements": [
+            "Encryption libraries",
+            "Key management service",
+            "Secure communication protocols",
+            "Encrypted database storage"
+          ],
+          "story_points": 8,
+          "priority": "Critical",
+          "labels": ["encryption", "security", "aes-256"]
+        }
+      ]
+    },
+    {
+      "key": "EPIC-9",
+      "summary": "Performance & Scalability",
+      "description": "As a user, I need EZBI to be fast and reliable as my business grows.",
+      "labels": ["performance", "scalability", "optimization"],
+      "priority": "Medium",
+      "stories": [
+        {
+          "summary": "Performance Optimization",
+          "description": "As a user, I want to have fast dashboard loading so that I can access information quickly.",
+          "acceptance_criteria": [
+            "Dashboard loads in <2 seconds",
+            "Prediction generation in <5 seconds",
+            "Optimized chart rendering",
+            "Efficient data caching",
+            "CDN for global access"
+          ],
+          "technical_requirements": [
+            "Performance optimization",
+            "Caching strategies",
+            "CDN implementation",
+            "Database optimization"
+          ],
+          "story_points": 13,
+          "priority": "Medium",
+          "labels": ["performance", "optimization", "caching"]
+        },
+        {
+          "summary": "Auto-Scaling Infrastructure",
+          "description": "As a system administrator, I want to have automatic scaling so that the system handles increased load.",
+          "acceptance_criteria": [
+            "Automatic horizontal scaling",
+            "Load balancing",
+            "Health monitoring",
+            "Graceful degradation",
+            "99.9% uptime guarantee"
+          ],
+          "technical_requirements": [
+            "Kubernetes orchestration",
+            "Auto-scaling configuration",
+            "Load balancer setup",
+            "Health check system"
+          ],
+          "story_points": 21,
+          "priority": "Medium",
+          "labels": ["scaling", "kubernetes", "infrastructure"]
+        }
+      ]
+    },
+    {
+      "key": "EPIC-10",
+      "summary": "Advanced Features",
+      "description": "As a power user, I need advanced features for complex analysis.",
+      "labels": ["advanced", "analytics", "scenarios"],
+      "priority": "Low",
+      "stories": [
+        {
+          "summary": "Scenario Planning Tool",
+          "description": "As a user, I want to create what-if scenarios so that I can plan for different business conditions.",
+          "acceptance_criteria": [
+            "Multiple scenario creation",
+            "Parameter adjustment interface",
+            "Scenario comparison view",
+            "Save/load scenario functionality",
+            "Scenario sharing capabilities"
+          ],
+          "technical_requirements": [
+            "Scenario modeling engine",
+            "Parameter adjustment UI",
+            "Comparison algorithms",
+            "Scenario storage system"
+          ],
+          "story_points": 13,
+          "priority": "Low",
+          "labels": ["scenarios", "planning", "what-if"]
+        },
+        {
+          "summary": "Advanced Statistical Analysis",
+          "description": "As a user, I want to access advanced statistical analysis so that I can dive deeper into my data.",
+          "acceptance_criteria": [
+            "Statistical significance testing",
+            "Correlation analysis",
+            "Trend decomposition",
+            "Seasonality analysis",
+            "Custom metric creation"
+          ],
+          "technical_requirements": [
+            "Statistical analysis library",
+            "Advanced visualization",
+            "Custom metric engine",
+            "Mathematical computation"
+          ],
+          "story_points": 21,
+          "priority": "Low",
+          "labels": ["statistics", "analysis", "advanced"]
+        }
+      ]
+    },
+    {
+      "key": "EPIC-11",
+      "summary": "Deployment & DevOps",
+      "description": "As a development team, we need reliable deployment and monitoring.",
+      "labels": ["devops", "deployment", "monitoring"],
+      "priority": "High",
+      "stories": [
+        {
+          "summary": "CI/CD Pipeline Setup",
+          "description": "As a developer, I want to have automated deployment so that releases are consistent and reliable.",
+          "acceptance_criteria": [
+            "Automated testing pipeline",
+            "Staging environment deployment",
+            "Production deployment automation",
+            "Rollback capabilities",
+            "Feature flag management"
+          ],
+          "technical_requirements": [
+            "GitHub Actions workflow",
+            "Docker containerization",
+            "Kubernetes deployment",
+            "Feature flag system"
+          ],
+          "story_points": 13,
+          "priority": "High",
+          "labels": ["cicd", "deployment", "automation"]
+        },
+        {
+          "summary": "Monitoring & Alerting System",
+          "description": "As a system administrator, I want to monitor system health so that I can proactively address issues.",
+          "acceptance_criteria": [
+            "Real-time monitoring dashboard",
+            "Performance metrics tracking",
+            "Error rate monitoring",
+            "Automated alert system",
+            "Log aggregation"
+          ],
+          "technical_requirements": [
+            "Monitoring stack (Prometheus/Grafana)",
+            "Log aggregation (ELK stack)",
+            "Alert management system",
+            "Performance monitoring"
+          ],
+          "story_points": 13,
+          "priority": "High",
+          "labels": ["monitoring", "alerting", "prometheus"]
+        }
+      ]
+    },
+    {
+      "key": "EPIC-12",
+      "summary": "Testing & Quality Assurance",
+      "description": "As a development team, we need comprehensive testing to ensure quality.",
+      "labels": ["testing", "quality", "automation"],
+      "priority": "High",
+      "stories": [
+        {
+          "summary": "Automated Testing Framework",
+          "description": "As a developer, I want to have comprehensive test coverage so that the application is reliable.",
+          "acceptance_criteria": [
+            "Unit test coverage >90%",
+            "Integration test suite",
+            "End-to-end testing",
+            "Performance testing",
+            "Security testing"
+          ],
+          "technical_requirements": [
+            "Jest/Pytest testing frameworks",
+            "Playwright E2E testing",
+            "Load testing tools",
+            "Security scanning tools"
+          ],
+          "story_points": 13,
+          "priority": "High",
+          "labels": ["testing", "automation", "coverage"]
+        },
+        {
+          "summary": "ML Model Testing & Validation",
+          "description": "As a data scientist, I want to validate ML model performance so that predictions are accurate.",
+          "acceptance_criteria": [
+            "Model accuracy validation",
+            "A/B testing framework",
+            "Performance benchmarking",
+            "Model drift detection",
+            "Automated retraining"
+          ],
+          "technical_requirements": [
+            "ML testing framework",
+            "Model validation pipeline",
+            "Performance benchmarking",
+            "Drift detection system"
+          ],
+          "story_points": 21,
+          "priority": "High",
+          "labels": ["ml-testing", "validation", "drift-detection"]
+        }
+      ]
+    }
+  ]
+}
