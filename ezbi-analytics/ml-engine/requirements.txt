@@ -1,0 +1,44 @@
+# Core ML Libraries
+pandas>=1.5.0
+numpy>=1.21.0
+scikit-learn>=1.1.0
+scipy>=1.9.0
+
+# Deep Learning
+tensorflow>=2.10.0
+torch>=1.12.0
+transformers>=4.21.0
+
+# Time Series
+prophet>=1.1.0
+statsmodels>=0.13.0
+tslearn>=0.5.0
+
+# Feature Engineering
+feature-engine>=1.4.0
+category-encoders>=2.5.0
+imbalanced-learn>=0.9.0
+
+# Model Management
+mlflow>=1.28.0
+optuna>=3.0.0
+joblib>=1.2.0
+
+# Utilities
+python-dateutil>=2.8.0
+holidays>=0.15
+pytz>=2022.1
+tqdm>=4.64.0
+pydantic>=1.10.0
+fastapi>=0.78.0
+uvicorn>=0.18.0
+
+# Monitoring
+prometheus-client>=0.14.0
+grafana-api>=1.0.0
+wandb>=0.13.0
+
+# Testing
+pytest>=7.1.0
+pytest-cov>=3.0.0
+pytest-mock>=3.8.0

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  namespace: ezbi-analytics
+  labels:
+    app: postgres
+    tier: database
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: postgres
+      tier: database
+  template:
+    metadata:
+      labels:
+        app: postgres
+        tier: database
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: ezbi-analytics-config
+              key: DATABASE_NAME
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: ezbi-analytics-config
+              key: DATABASE_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ezbi-analytics-secrets
+              key: postgres-password
+        - name: POSTGRES_HOST_AUTH_METHOD
+          value: \"trust\"\n        ports:\n        - containerPort: 5432\n          name: postgres\n        volumeMounts:\n        - name: postgres-storage\n          mountPath: /var/lib/postgresql/data\n        - name: postgres-init\n          mountPath: /docker-entrypoint-initdb.d\n        livenessProbe:\n          exec:\n            command:\n            - pg_isready\n            - -U\n            - ezbi_user\n            - -d\n            - ezbi_analytics\n          initialDelaySeconds: 30\n          periodSeconds: 10\n          timeoutSeconds: 5\n          successThreshold: 1\n          failureThreshold: 3\n        readinessProbe:\n          exec:\n            command:\n            - pg_isready\n            - -U\n            - ezbi_user\n            - -d\n            - ezbi_analytics\n          initialDelaySeconds: 5\n          periodSeconds: 5\n          timeoutSeconds: 5\n          successThreshold: 1\n          failureThreshold: 3\n        resources:\n          requests:\n            memory: \"512Mi\"\n            cpu: \"250m\"\n          limits:\n            memory: \"1Gi\"\n            cpu: \"500m\"\n      volumes:\n      - name: postgres-storage\n        persistentVolumeClaim:\n          claimName: postgres-pvc\n      - name: postgres-init\n        configMap:\n          name: postgres-init-scripts\n---\napiVersion: v1\nkind: Service\nmetadata:\n  name: postgres-service\n  namespace: ezbi-analytics\n  labels:\n    app: postgres\n    tier: database\nspec:\n  selector:\n    app: postgres\n    tier: database\n  ports:\n  - port: 5432\n    targetPort: 5432\n    protocol: TCP\n    name: postgres\n  type: ClusterIP\n---\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: redis-deployment\n  namespace: ezbi-analytics\n  labels:\n    app: redis\n    tier: cache\nspec:\n  replicas: 1\n  strategy:\n    type: Recreate\n  selector:\n    matchLabels:\n      app: redis\n      tier: cache\n  template:\n    metadata:\n      labels:\n        app: redis\n        tier: cache\n    spec:\n      containers:\n      - name: redis\n        image: redis:7-alpine\n        command:\n        - redis-server\n        - --appendonly\n        - \"yes\"\n        - --requirepass\n        - $(REDIS_PASSWORD)\n        env:\n        - name: REDIS_PASSWORD\n          valueFrom:\n            secretKeyRef:\n              name: ezbi-analytics-secrets\n              key: redis-password\n        ports:\n        - containerPort: 6379\n          name: redis\n        volumeMounts:\n        - name: redis-storage\n          mountPath: /data\n        livenessProbe:\n          exec:\n            command:\n            - redis-cli\n            - ping\n          initialDelaySeconds: 30\n          periodSeconds: 10\n          timeoutSeconds: 5\n          successThreshold: 1\n          failureThreshold: 3\n        readinessProbe:\n          exec:\n            command:\n            - redis-cli\n            - ping\n          initialDelaySeconds: 5\n          periodSeconds: 5\n          timeoutSeconds: 5\n          successThreshold: 1\n          failureThreshold: 3\n        resources:\n          requests:\n            memory: \"256Mi\"\n            cpu: \"125m\"\n          limits:\n            memory: \"512Mi\"\n            cpu: \"250m\"\n      volumes:\n      - name: redis-storage\n        persistentVolumeClaim:\n          claimName: redis-pvc\n---\napiVersion: v1\nkind: Service\nmetadata:\n  name: redis-service\n  namespace: ezbi-analytics\n  labels:\n    app: redis\n    tier: cache\nspec:\n  selector:\n    app: redis\n    tier: cache\n  ports:\n  - port: 6379\n    targetPort: 6379\n    protocol: TCP\n    name: redis\n  type: ClusterIP

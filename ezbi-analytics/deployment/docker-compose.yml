@@ -1,0 +1,233 @@
+version: '3.8'
+
+services:
+  # Database Services
+  postgres:
+    image: postgres:15-alpine
+    container_name: ezbi-postgres
+    environment:
+      POSTGRES_DB: ezbi_analytics
+      POSTGRES_USER: ezbi_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ezbi_secure_password}
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ezbi_user -d ezbi_analytics"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - ezbi-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: ezbi-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-ezbi_redis_password}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - ezbi-network
+
+  # Backend Services
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: ezbi-backend
+    environment:
+      - DATABASE_URL=postgresql://ezbi_user:${POSTGRES_PASSWORD:-ezbi_secure_password}@postgres:5432/ezbi_analytics
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-ezbi_redis_password}@redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+      - CORS_ORIGINS=http://localhost:3000,https://ezbi.example.com
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - ezbi-network
+
+  # ML Engine
+  ml-engine:
+    build:
+      context: ../ml-engine
+      dockerfile: Dockerfile
+      target: production
+    container_name: ezbi-ml-engine
+    environment:
+      - MODEL_PATH=/app/models
+      - INFERENCE_SERVER_HOST=0.0.0.0
+      - INFERENCE_SERVER_PORT=8001
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-ezbi_redis_password}@redis:6379/1
+      - DATABASE_URL=postgresql://ezbi_user:${POSTGRES_PASSWORD:-ezbi_secure_password}@postgres:5432/ezbi_analytics
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8001:8001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ml_models:/app/models
+      - ./logs:/app/logs
+    networks:
+      - ezbi-network
+
+  # Frontend
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      target: production
+      args:
+        - NEXT_PUBLIC_API_URL=http://localhost:8000
+        - NEXT_PUBLIC_ML_API_URL=http://localhost:8001
+    container_name: ezbi-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - ezbi-network
+
+  # Monitoring Services
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ezbi-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/alert.rules.yml:/etc/prometheus/alert.rules.yml
+      - prometheus_data:/prometheus
+    networks:
+      - ezbi-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ezbi-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - ezbi-network
+
+  # Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: ezbi-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - frontend
+      - backend
+      - ml-engine
+    networks:
+      - ezbi-network
+
+  # Background Workers
+  celery-worker:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: ezbi-celery-worker
+    command: celery -A app.core.celery worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://ezbi_user:${POSTGRES_PASSWORD:-ezbi_secure_password}@postgres:5432/ezbi_analytics
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-ezbi_redis_password}@redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+      - ENVIRONMENT=production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - ezbi-network
+
+  celery-beat:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: ezbi-celery-beat
+    command: celery -A app.core.celery beat --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://ezbi_user:${POSTGRES_PASSWORD:-ezbi_secure_password}@postgres:5432/ezbi_analytics
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-ezbi_redis_password}@redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+      - ENVIRONMENT=production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - ezbi-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  ml_models:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  ezbi-network:
+    driver: bridge
