@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-07-15T12:59:44.782178",
+  "summary": {
+    "total_invoices": 500,
+    "paid_invoices": 180,
+    "cash_transactions": 1180,
+    "ar_records": 320
+  },
+  "financial_totals": {
+    "total_invoice_amount": 6412612.72,
+    "total_cash_inflow": 21099833.99,
+    "total_cash_outflow": -3818912.52,
+    "net_cash_flow": 17280921.47
+  },
+  "validation_status": "All checks passed"
+}

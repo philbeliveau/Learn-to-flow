@@ -1,0 +1,228 @@
+2025-07-15 12:59:03,364 - INFO - 🚀 Starting SPARC accounting fix process...
+2025-07-15 12:59:03,364 - INFO - 📦 Creating backup of accounting data...
+2025-07-15 12:59:03,371 - INFO - ✅ Backup created successfully
+2025-07-15 12:59:03,371 - INFO - 🏗️ Implementing database architecture...
+2025-07-15 12:59:03,371 - WARNING - Statement 3 failed (may be expected): cannot commit - no transaction is active
+2025-07-15 12:59:03,371 - WARNING - Statement 6 failed (may be expected): cannot commit - no transaction is active
+2025-07-15 12:59:03,371 - WARNING - Statement 9 failed (may be expected): cannot commit - no transaction is active
+2025-07-15 12:59:03,371 - WARNING - Statement 16 failed (may be expected): cannot commit - no transaction is active
+2025-07-15 12:59:03,371 - WARNING - Statement 18 failed (may be expected): cannot commit - no transaction is active
+2025-07-15 12:59:03,375 - INFO - ✅ Architecture implemented successfully
+2025-07-15 12:59:03,375 - INFO - 💰 Fixing revenue recognition discrepancies...
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0002
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0005
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2025-0006
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0007
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2025-0008
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2025-0009
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2025-0015
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2025-0017
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2025-0021
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0027
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0029
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0030
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2025-0031
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0035
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2025-0038
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0040
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2025-0043
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0047
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2025-0051
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0056
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0060
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0063
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0067
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2025-0069
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0071
+2025-07-15 12:59:03,378 - INFO - Created cash entry for invoice INV-2024-0075
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0079
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0089
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0091
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0096
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0098
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0099
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0100
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0107
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0109
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0110
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0113
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0114
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0116
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0121
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0122
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0125
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0131
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0133
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0135
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0137
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0140
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0143
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0145
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0147
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0148
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0149
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0153
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0154
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0155
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0157
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0158
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0159
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0160
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0161
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0167
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2025-0169
+2025-07-15 12:59:03,379 - INFO - Created cash entry for invoice INV-2024-0177
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0179
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2024-0180
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2024-0181
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0182
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2024-0188
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2024-0194
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2024-0196
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0199
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2024-0200
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2024-0201
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2024-0204
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0205
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0208
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0214
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0216
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0218
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0220
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2024-0222
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0223
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2024-0228
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0229
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0242
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0244
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0248
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0249
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2024-0251
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2024-0252
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2024-0255
+2025-07-15 12:59:03,380 - INFO - Created cash entry for invoice INV-2025-0256
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0259
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0260
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0261
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0262
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0264
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0266
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0274
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0278
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0284
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0285
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0290
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0295
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0296
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0297
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0299
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0300
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0303
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0304
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0310
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0312
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0313
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0314
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0316
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0318
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0319
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0320
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0323
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0334
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0335
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0336
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0337
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0339
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0342
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0347
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0349
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0350
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0352
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0353
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0355
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0357
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2025-0360
+2025-07-15 12:59:03,381 - INFO - Created cash entry for invoice INV-2024-0361
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0365
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0366
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0368
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0375
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0379
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0381
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0384
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0385
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0387
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0388
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0394
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0397
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0399
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0403
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0410
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0415
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0416
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0418
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0422
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0424
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0426
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0428
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0434
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0436
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0438
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0441
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0443
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0444
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0445
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0447
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0448
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0452
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0455
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0460
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0462
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0464
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0469
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0474
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0475
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2024-0479
+2025-07-15 12:59:03,382 - INFO - Created cash entry for invoice INV-2025-0481
+2025-07-15 12:59:03,383 - INFO - Created cash entry for invoice INV-2025-0483
+2025-07-15 12:59:03,383 - INFO - Created cash entry for invoice INV-2024-0491
+2025-07-15 12:59:03,383 - INFO - Created cash entry for invoice INV-2024-0493
+2025-07-15 12:59:03,383 - INFO - Created cash entry for invoice INV-2025-0496
+2025-07-15 12:59:03,383 - INFO - Created cash entry for invoice INV-2025-0497
+2025-07-15 12:59:03,385 - INFO - ✅ Revenue recognition fixes: 180 cash entries created
+2025-07-15 12:59:03,385 - INFO - 📋 Fixing accounts receivable discrepancies...
+2025-07-15 12:59:03,385 - ERROR - ❌ AR fix failed: no such column: days_until_due
+2025-07-15 12:59:03,385 - ERROR - ❌ SPARC accounting fix failed: no such column: days_until_due
+2025-07-15 12:59:03,388 - ERROR - Traceback (most recent call last):
+  File "/Users/philippebeliveau/Desktop/Notebook/Learn-to-flow/fix_accounting_discrepancies.py", line 63, in execute_fix
+    ar_results = self.fix_accounts_receivable()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/philippebeliveau/Desktop/Notebook/Learn-to-flow/fix_accounting_discrepancies.py", line 301, in fix_accounts_receivable
+    self.conn.execute("""
+sqlite3.OperationalError: no such column: days_until_due
+
+2025-07-15 12:59:03,388 - INFO - 🔄 Rolling back changes...
+2025-07-15 12:59:03,388 - INFO - ✅ Rollback completed
+2025-07-15 12:59:44,697 - INFO - 🚀 Starting SPARC accounting fix process...
+2025-07-15 12:59:44,697 - INFO - 📦 Creating backup of accounting data...
+2025-07-15 12:59:44,704 - INFO - ✅ Backup created successfully
+2025-07-15 12:59:44,704 - INFO - 🏗️ Implementing database architecture...
+2025-07-15 12:59:44,704 - WARNING - Statement 3 failed (may be expected): cannot commit - no transaction is active
+2025-07-15 12:59:44,704 - WARNING - Statement 6 failed (may be expected): cannot commit - no transaction is active
+2025-07-15 12:59:44,704 - WARNING - Statement 9 failed (may be expected): cannot commit - no transaction is active
+2025-07-15 12:59:44,704 - WARNING - Statement 16 failed (may be expected): cannot commit - no transaction is active
+2025-07-15 12:59:44,704 - WARNING - Statement 18 failed (may be expected): cannot commit - no transaction is active
+2025-07-15 12:59:44,704 - INFO - ✅ Architecture implemented successfully
+2025-07-15 12:59:44,704 - INFO - 💰 Fixing revenue recognition discrepancies...
+2025-07-15 12:59:44,707 - INFO - ✅ Revenue recognition fixes: 0 cash entries created
+2025-07-15 12:59:44,707 - INFO - 📋 Fixing accounts receivable discrepancies...
+2025-07-15 12:59:44,710 - INFO - ✅ AR fixes: 0 created, 133 updated, 0 removed
+2025-07-15 12:59:44,710 - INFO - 💵 Fixing cash flow integrity...
+2025-07-15 12:59:44,778 - INFO - ✅ Cash flow fixes: 1180 balances, 445 types
+2025-07-15 12:59:44,778 - INFO - 🔍 Validating accounting fixes...
+2025-07-15 12:59:44,781 - WARNING - ⚠️ Some validation checks failed
+2025-07-15 12:59:44,781 - INFO - 📊 Generating reconciliation report...
+2025-07-15 12:59:44,782 - INFO - 🔍 Validating accounting fixes...
+2025-07-15 12:59:44,782 - WARNING - ⚠️ Some validation checks failed
+2025-07-15 12:59:44,783 - INFO - ✅ Reconciliation report generated
+2025-07-15 12:59:44,783 - INFO - ✅ SPARC accounting fix completed successfully

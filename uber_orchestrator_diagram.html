@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UBER Orchestrator Flowchart</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .diagram-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>UBER Orchestrator Flowchart</h1>
+    <div class="diagram-container">
+        <div class="mermaid">
+flowchart TD
+    A["Start: UBER Orchestrator Triggered"] --> B["Mandatory Information Gathering"]
+    B --> B1["read_file: .roomodes"]
+    B --> B2["use_mcp_tool: project_memorys + user_preferences"]
+    B --> C{"Check Files Present?"}
+    C -->|"Missing Mutual_Understanding_Document.md"| D["Delegate: orchestrator-goal-clarification"]
+    C -->|"Missing Specification Document"| E["Delegate: orchestrator-sparc-specification-phase"]
+    C -->|"Both Found"| F["State Analysis & Next Step Determination"]
+
+    F --> F1["Synthesize State"]
+    F1 --> F2["Determine Current SPARC Phase"]
+
+    F2 --> G["Plan Next Delegation"]
+    G --> H["Score Plan (0.0-10.0)"]
+    H --> I{"Score ≥ 9.5?"}
+    I -->|"No"| G2["Revise Plan and Repeat"]
+    G2 --> H
+    I -->|"Yes"| J["ask_followup_question: User Approval"]
+
+    J --> K{"User Approval Received?"}
+    K -->|"No"| L["Delegate: feedback-logger"]
+    K -->|"Yes"| M["Prepare Task Payload"]
+
+    M --> N["Delegate to Phase Orchestrator"]
+    N --> O["Dispatch: new_task"]
+    O --> P["Prepare Summary Analysis"]
+    P --> Q["attempt_completion"]
+
+    style A fill:#222,color:#fff
+    style D fill:#833,color:#fff
+    style E fill:#833,color:#fff
+    style G2 fill:#f99,color:#000
+    style Q fill:#0a0,color:#fff
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+    </script>
+</body>
+</html>
