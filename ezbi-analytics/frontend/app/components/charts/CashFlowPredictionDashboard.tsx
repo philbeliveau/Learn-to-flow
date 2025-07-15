@@ -287,7 +287,7 @@ const CashFlowPredictionDashboard: React.FC<CashFlowPredictionDashboardProps> = 
     const scenarios = ['base_case', 'optimistic', 'pessimistic'];
     const labels = ['Cas de base', 'Optimiste', 'Pessimiste'];
     const data = scenarios.map(scenario => {
-      const monthlyData = predictionData.scenarios[scenario]?.monthly_summary;
+      const monthlyData = predictionData.scenarios[scenario as keyof typeof predictionData.scenarios]?.monthly_summary;
       return monthlyData && monthlyData.length > 0 ? monthlyData[0]?.ending_balance || 0 : 0;
     });
 
@@ -325,7 +325,7 @@ const CashFlowPredictionDashboard: React.FC<CashFlowPredictionDashboardProps> = 
       model_type: modelPerformance.model_info.model_type || 'Non disponible',
       last_training_date: modelPerformance.model_info.last_training_date || null,
       confidence_interval: modelPerformance.model_info.confidence_interval || 0,
-      available_models: modelPerformance.model_info.available_models || []
+      available_models: (modelPerformance.model_info as any).available_models || []
     };
   };
 

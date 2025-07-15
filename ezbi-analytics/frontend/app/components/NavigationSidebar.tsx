@@ -47,6 +47,16 @@ const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeTab, onTabC
       color: '#74a6be'
     },
     {
+      id: 'manufacturing-bi',
+      name: 'Manufacturing BI',
+      icon: (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M2 3h6v4H2V3zm6 8H2v8h6v-8zm2-8h12v4H10V3zm12 6H10v2h12V9zm-12 4h12v8H10v-8z"/>
+        </svg>
+      ),
+      color: '#a7292e'
+    },
+    {
       id: 'predictions',
       name: 'Cash Flow IA',
       icon: (
