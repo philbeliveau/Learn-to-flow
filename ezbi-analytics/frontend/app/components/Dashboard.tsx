@@ -30,11 +30,11 @@ ChartJS.register(
 );
 
 import NavigationSidebar from './NavigationSidebar';
-import OverviewCharts from './charts/OverviewCharts';
-import FinancialCharts from './charts/FinancialCharts';
-import ManufacturingCharts from './charts/ManufacturingCharts';
-import CashFlowPredictionDashboard from './charts/CashFlowPredictionDashboard';
-import AnalyticsCharts from './charts/AnalyticsCharts';
+import OverviewChartsFixed from './charts/OverviewChartsFixed';
+import FinancialChartsFixed from './charts/FinancialChartsFixed';
+import ManufacturingChartsFixed from './charts/ManufacturingChartsFixed';
+import CashFlowPredictionDashboardFixed from './charts/CashFlowPredictionDashboardFixed';
+import AnalyticsChartsFixed from './charts/AnalyticsChartsFixed';
 import ManufacturingDashboardSimple from './charts/ManufacturingDashboardSimple';
 
 interface DashboardProps {
@@ -206,22 +206,22 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'overview':
-        return <OverviewCharts kpis={kpis} />;
+        return <OverviewChartsFixed kpis={kpis} />;
       case 'financial':
-        return <FinancialCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
+        return <FinancialChartsFixed chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       case 'manufacturing':
-        return <ManufacturingCharts chartOptions={chartOptions} />;
+        return <ManufacturingChartsFixed chartOptions={chartOptions} />;
       case 'manufacturing-bi':
         return <ManufacturingDashboardSimple />;
       case 'predictions':
-        return <CashFlowPredictionDashboard 
+        return <CashFlowPredictionDashboardFixed 
           chartOptions={chartOptions} 
           pieChartOptions={pieChartOptions}
         />;
       case 'analytics':
-        return <AnalyticsCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
+        return <AnalyticsChartsFixed chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       default:
-        return <OverviewCharts kpis={kpis} />;
+        return <OverviewChartsFixed kpis={kpis} />;
     }
   };
 

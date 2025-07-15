@@ -602,3 +602,106 @@ Claude Flow extends the base coordination with:
 ---
 
 Remember: **Claude Flow coordinates, Claude Code creates!** Start with `mcp__claude-flow__swarm_init` to enhance your development workflow.
+
+## 🚨 CRITICAL: MANUFACTURING TABLE CONSISTENCY REQUIREMENTS
+
+### Database Connection Requirement
+**MANDATORY**: All dashboard components MUST connect to the manufacturing tables in `data/ezbi_analytics.db`. This is a critical business requirement that ensures data consistency and accuracy.
+
+### Tables Structure
+The system uses 13 manufacturing tables organized into 6 business schemas:
+- **sales.**: customers, invoices 
+- **accounting.**: vendors, accounts_payable, accounts_receivable
+- **operations.**: products, production_orders  
+- **finance.**: cash_ledger, debt_accounts
+- **hr.**: employees, payroll
+- **expenses.**: expenses
+
+### API Endpoints
+All components MUST use the Flask API on port 8003:
+- Base URL: `http://localhost:8003` (configurable via `NEXT_PUBLIC_API_URL`)
+- API Pattern: `/api/manufacturing/{schema}/{endpoint}`
+- Examples: `/api/manufacturing/sales/kpis`, `/api/manufacturing/operations/products`
+
+### Fixed Component Pattern
+All dashboard tabs have been updated to use "Fixed" versions that connect to manufacturing tables:
+- ✅ **OverviewChartsFixed.tsx** - Connects to all 13 manufacturing tables
+- ✅ **FinancialChartsFixed.tsx** - Connects to finance_* and accounting_* tables
+- ✅ **ManufacturingChartsFixed.tsx** - Connects to operations_* tables
+- ✅ **CashFlowPredictionDashboardFixed.tsx** - Uses manufacturing data for AI predictions
+- ✅ **AnalyticsChartsFixed.tsx** - Aggregates data from all 13 tables
+
+### Data Source Indicators
+Each component includes a data source indicator showing:
+- ✅ Connection status to manufacturing tables
+- Table names and record counts
+- "Live Data" or "Real-time" indicators
+
+### Common Issues and Solutions
+1. **Legacy Service Usage**: Components using `syntheticDataService` or port 8004 servers are WRONG
+2. **Missing Manufacturing Connection**: All KPIs and charts must derive from manufacturing tables
+3. **Data Inconsistency**: Different tabs showing different data sources breaks business intelligence
+4. **Missing API Endpoints**: Ensure Flask API has all required manufacturing endpoints
+
+### Verification Steps
+Before deploying any dashboard component:
+1. Check that it imports from manufacturing API endpoints
+2. Verify data source indicators show manufacturing tables
+3. Confirm no usage of legacy services or synthetic data generators
+4. Test all API endpoints return manufacturing data
+
+This requirement is NON-NEGOTIABLE for business intelligence accuracy.
+
+## 🚀 EFFICIENCY IMPROVEMENTS FOR CLAUDE
+
+### Development Workflow Optimization
+To increase development efficiency, always follow these patterns:
+
+#### 1. **Batch File Operations**
+- Never read/write files one at a time
+- Always use multiple tool calls in a single message
+- Example: Read 5 files simultaneously, not in 5 separate messages
+
+#### 2. **Manufacturing Table First**
+- Always check manufacturing table structure before building components
+- Use consistent API patterns: `/api/manufacturing/{schema}/{endpoint}`
+- Verify data source connections before implementation
+
+#### 3. **Component Naming Convention**
+- Use "Fixed" suffix for components that connect to manufacturing tables
+- Original components are legacy and should be avoided
+- Example: `OverviewChartsFixed.tsx` vs `OverviewCharts.tsx`
+
+#### 4. **Memory Usage for Context**
+- Store critical project decisions in Claude Flow memory
+- Use memory to track fixes and improvements across sessions
+- Pattern: `mcp__claude-flow__memory_usage` for important state
+
+#### 5. **Error Prevention**
+- Always check for optional chaining in TypeScript: `data?.field`
+- Include error handling and loading states in all components
+- Add data source indicators to verify table connections
+
+#### 6. **Testing Approach**
+- Test API endpoints before building components
+- Verify data structure matches component interfaces
+- Check error handling with retry mechanisms
+
+#### 7. **Documentation Standards**
+- Update CLAUDE.md with critical business requirements
+- Include non-negotiable technical constraints
+- Document common issues and solutions
+
+### Performance Patterns
+1. **Parallel API Calls**: Use `Promise.all()` for multiple endpoints
+2. **Proper Loading States**: Show spinners during data fetching
+3. **Error Boundaries**: Graceful failure handling with retry options
+4. **Data Caching**: Leverage browser caching for manufacturing data
+
+### Business Intelligence Focus
+- All dashboard components must connect to manufacturing tables
+- Data consistency is critical for business decision-making
+- Real-time data indicators build user trust
+- Cross-table analytics provide comprehensive insights
+
+These patterns ensure faster development, fewer bugs, and consistent business intelligence across the platform.
