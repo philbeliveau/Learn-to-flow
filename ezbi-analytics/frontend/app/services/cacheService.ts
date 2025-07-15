@@ -390,11 +390,11 @@ export class CacheService {
 
   private cleanupExpiredEntries(): void {
     const now = Date.now();
-    for (const [key, entry] of this.memoryCache.entries()) {
+    Array.from(this.memoryCache.entries()).forEach(([key, entry]) => {
       if (now - entry.timestamp > entry.ttl * 1000) {
         this.memoryCache.delete(key);
       }
-    }
+    });
   }
 }
 

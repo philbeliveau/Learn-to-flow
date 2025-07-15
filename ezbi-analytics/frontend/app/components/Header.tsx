@@ -44,11 +44,17 @@ export default function Header() {
               onClick={scrollToLogin}
               className="text-white px-6 py-2 font-light transition-all hover:scale-105"
               style={{backgroundColor: '#a7292e'}}
-              onMouseEnter={(e) => e.target.style.backgroundColor = '#8a1f24'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = '#a7292e'}
+              onMouseEnter={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#8a1f24'}
+              onMouseLeave={(e) => (e.target as HTMLButtonElement).style.backgroundColor = '#a7292e'}
             >
-              Accès dashboard
+              Connexion
             </button>
+            <a
+              href="/services/intelligence-complete"
+              className="text-white px-4 py-2 border border-gray-600 hover:border-white font-light transition-all hover:scale-105"
+            >
+              Services
+            </a>
           </nav>
           
           {/* Mobile Menu Button */}

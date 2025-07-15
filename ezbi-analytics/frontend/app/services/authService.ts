@@ -6,7 +6,7 @@
 
 import { jwtDecode } from 'jwt-decode';
 
-// API Configuration
+// API Configuration - Use authentication server on port 8004
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 const ACCESS_TOKEN_KEY = 'access_token';
@@ -141,6 +141,11 @@ export class AuthService {
    * Initialize authentication state from localStorage
    */
   private initializeFromStorage(): void {
+    // Skip initialization during SSR
+    if (typeof window === 'undefined') {
+      return;
+    }
+    
     try {
       const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
       const userData = localStorage.getItem(USER_DATA_KEY);
@@ -178,30 +183,40 @@ export class AuthService {
         throw new Error('Login failed');
       }
 
-      const data: AuthResponse = await response.json();
+      const data = await response.json();
 
-      if (data.success && data.access_token && data.user) {
-        // Store tokens and user data
-        localStorage.setItem(ACCESS_TOKEN_KEY, data.access_token);
-        if (data.refresh_token) {
-          localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh_token);
+      // Handle simple auth service response format
+      if (data.access_token && data.user) {
+        // Store tokens and user data (only in browser)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(ACCESS_TOKEN_KEY, data.access_token);
+          // No refresh token in simple auth service
         }
         
         // Enhanced user data with permissions
         const enhancedUser = {
           ...data.user,
-          permissions: ROLE_PERMISSIONS[data.user.role] || []
+          permissions: ROLE_PERMISSIONS[data.user.role as UserRole] || []
         };
         
-        localStorage.setItem(USER_DATA_KEY, JSON.stringify(enhancedUser));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(USER_DATA_KEY, JSON.stringify(enhancedUser));
+        }
         
         this.user = enhancedUser;
         this.scheduleTokenRefresh();
         
-        return { ...data, user: enhancedUser };
+        return { 
+          success: true,
+          access_token: data.access_token,
+          user: enhancedUser
+        };
       }
 
-      return data;
+      return {
+        success: false,
+        message: 'Invalid response format'
+      };
     } catch (error) {
       console.error('Login error:', error);
       return {
@@ -228,8 +243,10 @@ export class AuthService {
       const data = await response.json();
       
       if (data.success) {
-        // Store MFA secret temporarily for verification
-        localStorage.setItem(MFA_SECRET_KEY, data.secret);
+        // Store MFA secret temporarily for verification (only in browser)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(MFA_SECRET_KEY, data.secret);
+        }
         return data;
       }
 
@@ -245,6 +262,10 @@ export class AuthService {
    */
   public async verifyMFA(code: string): Promise<boolean> {
     try {
+      if (typeof window === 'undefined') {
+        return false;
+      }
+      
       const secret = localStorage.getItem(MFA_SECRET_KEY);
       if (!secret) {
         return false;
@@ -263,12 +284,14 @@ export class AuthService {
       const data = await response.json();
       
       if (data.success) {
-        // Clear temporary secret
-        localStorage.removeItem(MFA_SECRET_KEY);
-        // Update user MFA status
-        if (this.user) {
-          this.user.is_mfa_enabled = true;
-          localStorage.setItem(USER_DATA_KEY, JSON.stringify(this.user));
+        // Clear temporary secret (only in browser)
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(MFA_SECRET_KEY);
+          // Update user MFA status
+          if (this.user) {
+            this.user.is_mfa_enabled = true;
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify(this.user));
+          }
         }
         return true;
       }
@@ -285,6 +308,10 @@ export class AuthService {
    */
   public async refreshToken(): Promise<boolean> {
     try {
+      if (typeof window === 'undefined') {
+        return false;
+      }
+      
       const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
       if (!refreshToken) {
         return false;
@@ -306,7 +333,9 @@ export class AuthService {
       const data = await response.json();
       
       if (data.success && data.access_token) {
-        localStorage.setItem(ACCESS_TOKEN_KEY, data.access_token);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(ACCESS_TOKEN_KEY, data.access_token);
+        }
         this.scheduleTokenRefresh();
         return true;
       }
@@ -324,6 +353,11 @@ export class AuthService {
    */
   public async logout(): Promise<void> {
     try {
+      if (typeof window === 'undefined') {
+        this.clearAuthData();
+        return;
+      }
+      
       const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
       if (refreshToken) {
         await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
@@ -344,6 +378,9 @@ export class AuthService {
    * Check if user is authenticated
    */
   public isAuthenticated(): boolean {
+    if (typeof window === 'undefined') {
+      return false;
+    }
     const token = localStorage.getItem(ACCESS_TOKEN_KEY);
     return token !== null && this.isTokenValid(token) && this.user !== null;
   }
@@ -387,6 +424,10 @@ export class AuthService {
    * Get authentication headers for API requests
    */
   public async getAuthHeaders(): Promise<HeadersInit> {
+    if (typeof window === 'undefined') {
+      throw new Error('Authentication required');
+    }
+    
     const token = localStorage.getItem(ACCESS_TOKEN_KEY);
     
     if (!token || !this.isTokenValid(token)) {
@@ -420,11 +461,13 @@ export class AuthService {
       if (data.success && data.user) {
         const enhancedUser = {
           ...data.user,
-          permissions: ROLE_PERMISSIONS[data.user.role] || []
+          permissions: ROLE_PERMISSIONS[data.user.role as UserRole] || []
         };
         
         this.user = enhancedUser;
-        localStorage.setItem(USER_DATA_KEY, JSON.stringify(enhancedUser));
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(USER_DATA_KEY, JSON.stringify(enhancedUser));
+        }
         return enhancedUser;
       }
 
@@ -456,6 +499,10 @@ export class AuthService {
       clearTimeout(this.tokenRefreshTimer);
     }
 
+    if (typeof window === 'undefined') {
+      return;
+    }
+    
     const token = localStorage.getItem(ACCESS_TOKEN_KEY);
     if (!token) return;
 
@@ -479,10 +526,12 @@ export class AuthService {
    * Clear all authentication data
    */
   private clearAuthData(): void {
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(USER_DATA_KEY);
-    localStorage.removeItem(MFA_SECRET_KEY);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(ACCESS_TOKEN_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      localStorage.removeItem(USER_DATA_KEY);
+      localStorage.removeItem(MFA_SECRET_KEY);
+    }
     
     this.user = null;
     

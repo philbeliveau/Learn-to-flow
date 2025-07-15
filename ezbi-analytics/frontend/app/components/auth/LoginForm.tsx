@@ -168,13 +168,13 @@ export default function LoginForm({ onLogin, apiStatus }: LoginFormProps) {
             <p className="text-sm text-white/60 mb-2">Demo Credentials:</p>
             <div className="space-y-1 text-sm">
               <p className="text-white/80">
-                <span className="text-white">Admin:</span> admin@ezbi.fr / admin123
+                <span className="text-white">Admin:</span> admin@ezbi.com / admin
               </p>
               <p className="text-white/80">
-                <span className="text-white">Manager:</span> manager@ezbi.fr / manager123
+                <span className="text-white">User:</span> user@ezbi.com / password
               </p>
               <p className="text-white/80">
-                <span className="text-white">Analyst:</span> analyst@ezbi.fr / analyst123
+                <span className="text-white">Demo:</span> demo@ezbi.com / demo
               </p>
             </div>
           </div>

@@ -79,7 +79,7 @@ export default function Contact() {
                     <input
                       type="text"
                       className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 text-white"
-                      style={{'--tw-ring-color': '#74a6be'}}
+                      style={{['--tw-ring-color' as any]: '#74a6be'}}
                       placeholder="Votre PME manufacturière"
                     />
                   </div>
@@ -91,7 +91,7 @@ export default function Contact() {
                     <input
                       type="email"
                       className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 text-white"
-                      style={{'--tw-ring-color': '#74a6be'}}
+                      style={{['--tw-ring-color' as any]: '#74a6be'}}
                       placeholder="dirigeant@votrepme.fr"
                     />
                   </div>
@@ -116,7 +116,7 @@ export default function Contact() {
                     <textarea
                       rows={4}
                       className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 text-white"
-                      style={{'--tw-ring-color': '#74a6be'}}
+                      style={{['--tw-ring-color' as any]: '#74a6be'}}
                       placeholder="Décrivez votre problématique de trésorerie ou production..."
                     ></textarea>
                   </div>

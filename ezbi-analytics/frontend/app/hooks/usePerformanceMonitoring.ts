@@ -101,7 +101,7 @@ export function usePerformanceMonitoring() {
     const cacheKey = `api_${endpoint}`;
     
     try {
-      let result: T;
+      let result!: T; // Definite assignment assertion
       let fromCache = false;
       
       // Check cache first if enabled
@@ -136,6 +136,7 @@ export function usePerformanceMonitoring() {
           duration: performance.now() - startTime
         });
       }
+      
       
       const duration = performance.now() - startTime;
       

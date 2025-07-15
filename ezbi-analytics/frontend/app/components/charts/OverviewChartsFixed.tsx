@@ -235,7 +235,7 @@ const OverviewChartsFixed: React.FC<OverviewChartsProps> = ({ kpis }) => {
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-white/70">Prêts actifs:</span>
-                <span className="text-white">{formatNumber(kpiData.finance.total_loans)}</span>
+                <span className="text-white">{formatNumber(kpiData.finance.total_debt)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-white/70">Taux d'intérêt moyen:</span>
