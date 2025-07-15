@@ -676,6 +676,221 @@ async def create_product(
     )
 
 # ===================
+# FINANCE ENDPOINTS
+# ===================
+
+@router.get("/finance/kpis", response_model=Dict[str, Any])
+async def get_finance_kpis(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_session)
+):
+    """Get finance KPIs from manufacturing tables - requires finance_read permission"""
+    
+    # Check permission
+    if not await check_manufacturing_access(current_user, "finance", "read"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions for finance data"
+        )
+    
+    # Rate limiting
+    await check_rate_limit(current_user, request)
+    
+    # Log access
+    await log_api_access(request, current_user, "/finance/kpis", "read", db)
+    
+    # Get finance KPIs from manufacturing tables
+    finance_kpis = await db.execute(
+        text("""
+            SELECT 
+                COALESCE(SUM(CASE WHEN transaction_type = 'Inflow' THEN amount ELSE -amount END), 0) as total_cash_flow,
+                COALESCE(SUM(principal_amount), 0) as total_debt,
+                COALESCE(AVG(interest_rate), 0.05) as interest_rate,
+                COALESCE(SUM(monthly_payment_amount), 0) as monthly_payments,
+                COUNT(DISTINCT account_number) as debt_accounts_count
+            FROM finance.debt_accounts
+        """)
+    )
+    kpis = finance_kpis.first()
+    
+    return {
+        "total_cash_flow": float(kpis.total_cash_flow) if kpis.total_cash_flow else 0.0,
+        "total_debt": float(kpis.total_debt) if kpis.total_debt else 0.0,
+        "interest_rate": float(kpis.interest_rate) if kpis.interest_rate else 0.05,
+        "monthly_payments": float(kpis.monthly_payments) if kpis.monthly_payments else 0.0,
+        "debt_accounts_count": kpis.debt_accounts_count if kpis.debt_accounts_count else 0
+    }
+
+@router.get("/finance/cash-ledger", response_model=Dict[str, Any])
+async def get_cash_ledger(
+    request: Request,
+    limit: int = Query(50, ge=1, le=500),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_session)
+):
+    """Get cash ledger transactions - requires finance_read permission"""
+    
+    # Check permission
+    if not await check_manufacturing_access(current_user, "finance", "read"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions for finance data"
+        )
+    
+    # Rate limiting
+    await check_rate_limit(current_user, request)
+    
+    # Log access
+    await log_api_access(request, current_user, "/finance/cash-ledger", "read", db)
+    
+    # Get recent cash ledger transactions
+    transactions = await db.execute(
+        text("""
+            SELECT transaction_number, transaction_type, amount, 
+                   counterparty, date_recorded
+            FROM finance.cash_ledger
+            ORDER BY date_recorded DESC
+            LIMIT :limit
+        """),
+        {"limit": limit}
+    )
+    
+    data = [
+        {
+            "transaction_number": row.transaction_number,
+            "transaction_type": row.transaction_type,
+            "amount": float(row.amount),
+            "counterparty": row.counterparty,
+            "date_recorded": row.date_recorded.isoformat()
+        }
+        for row in transactions.all()
+    ]
+    
+    return {"data": data, "count": len(data)}
+
+@router.get("/finance/debt-accounts", response_model=Dict[str, Any])
+async def get_debt_accounts(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_session)
+):
+    """Get debt accounts summary - requires finance_read permission"""
+    
+    # Check permission
+    if not await check_manufacturing_access(current_user, "finance", "read"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions for finance data"
+        )
+    
+    # Rate limiting
+    await check_rate_limit(current_user, request)
+    
+    # Log access
+    await log_api_access(request, current_user, "/finance/debt-accounts", "read", db)
+    
+    # Get debt accounts
+    accounts = await db.execute(
+        text("""
+            SELECT account_number, institution_name, principal_amount,
+                   outstanding_balance, interest_rate, monthly_payment_amount,
+                   loan_start_date, loan_end_date
+            FROM finance.debt_accounts
+            ORDER BY outstanding_balance DESC
+        """)
+    )
+    
+    data = [
+        {
+            "account_number": row.account_number,
+            "institution_name": row.institution_name,
+            "principal_amount": float(row.principal_amount),
+            "outstanding_balance": float(row.outstanding_balance),
+            "interest_rate": float(row.interest_rate),
+            "monthly_payment_amount": float(row.monthly_payment_amount),
+            "loan_start_date": row.loan_start_date.isoformat(),
+            "loan_end_date": row.loan_end_date.isoformat() if row.loan_end_date else None
+        }
+        for row in accounts.all()
+    ]
+    
+    return {"data": data, "count": len(data)}
+
+# ===================
+# ACCOUNTING ENDPOINTS
+# ===================
+
+@router.get("/accounting/kpis", response_model=Dict[str, Any])
+async def get_accounting_kpis(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_session)
+):
+    """Get accounting KPIs from manufacturing tables - requires accounting_read permission"""
+    
+    # Check permission
+    if not await check_manufacturing_access(current_user, "accounting", "read"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions for accounting data"
+        )
+    
+    # Rate limiting
+    await check_rate_limit(current_user, request)
+    
+    # Log access
+    await log_api_access(request, current_user, "/accounting/kpis", "read", db)
+    
+    # Get AR aging data
+    ar_aging = await db.execute(
+        text("""
+            SELECT 
+                CASE 
+                    WHEN days_outstanding <= 30 THEN '0-30 days'
+                    WHEN days_outstanding <= 60 THEN '31-60 days'
+                    WHEN days_outstanding <= 90 THEN '61-90 days'
+                    ELSE '90+ days'
+                END as aging_bucket,
+                COUNT(*) as invoice_count,
+                SUM(outstanding_amount) as total_amount
+            FROM accounting.accounts_receivable
+            GROUP BY aging_bucket
+            ORDER BY aging_bucket
+        """)
+    )
+    
+    ar_data = [
+        {
+            "aging_bucket": row.aging_bucket,
+            "invoice_count": row.invoice_count,
+            "total_amount": float(row.total_amount)
+        }
+        for row in ar_aging.all()
+    ]
+    
+    # Get AP summary
+    ap_summary = await db.execute(
+        text("""
+            SELECT 
+                COUNT(*) as total_payables,
+                SUM(amount_due) as total_amount,
+                AVG(days_until_due) as avg_days_until_due
+            FROM accounting.accounts_payable
+        """)
+    )
+    ap_data = ap_summary.first()
+    
+    return {
+        "ar_aging": ar_data,
+        "ap_summary": {
+            "total_payables": ap_data.total_payables if ap_data else 0,
+            "total_amount": float(ap_data.total_amount) if ap_data and ap_data.total_amount else 0.0,
+            "avg_days_until_due": float(ap_data.avg_days_until_due) if ap_data and ap_data.avg_days_until_due else 0.0
+        }
+    }
+
+# ===================
 # DASHBOARD ENDPOINTS
 # ===================
 

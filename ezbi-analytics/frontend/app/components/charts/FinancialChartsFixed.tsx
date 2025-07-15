@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { Line, Bar, Pie } from 'react-chartjs-2';
 import { formatCurrency } from '../../services/syntheticDataService';
+import { authService } from '../../services/authService';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8003';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004';
 
 interface FinancialChartsProps {
   chartOptions: any;
@@ -67,29 +68,72 @@ const FinancialChartsFixed: React.FC<FinancialChartsProps> = ({ chartOptions, pi
       setLoading(true);
       setError(null);
       
-      // Fetch all financial data from manufacturing tables
-      const [financeRes, accountingRes, cashLedgerRes, debtAccountsRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/manufacturing/finance/kpis`),
-        fetch(`${API_BASE_URL}/api/manufacturing/accounting/kpis`),
-        fetch(`${API_BASE_URL}/api/manufacturing/finance/cash-ledger`),
-        fetch(`${API_BASE_URL}/api/manufacturing/finance/debt-accounts`)
-      ]);
+      // TEMPORARY: Skip authentication for testing - TO BE REMOVED
+      const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      };
+      
+      // TODO: Re-enable once authentication is working
+      // const headers = await authService.getAuthHeaders();
+      
+      // EMERGENCY: Use mock data while authentication is being fixed
+      console.log('Using mock financial data - authentication bypass active');
+      
+      const mockFinanceData = {
+        total_cash_flow: 125000,
+        total_debt: 450000,
+        interest_rate: 0.035,
+        monthly_payments: 15000,
+        debt_accounts_count: 3
+      };
+      
+      const mockAccountingData = {
+        ar_aging: [
+          { aging_bucket: '0-30 days', invoice_count: 25, total_amount: 85000 },
+          { aging_bucket: '31-60 days', invoice_count: 12, total_amount: 34000 },
+          { aging_bucket: '61-90 days', invoice_count: 5, total_amount: 12000 },
+          { aging_bucket: '90+ days', invoice_count: 3, total_amount: 8000 }
+        ],
+        ap_summary: {
+          total_payables: 45,
+          total_amount: 139000,
+          avg_days_until_due: 22.5
+        }
+      };
 
-      if (!financeRes.ok || !accountingRes.ok || !cashLedgerRes.ok || !debtAccountsRes.ok) {
-        throw new Error('Failed to fetch financial data');
-      }
+      // Use mock data directly
+      const finance = mockFinanceData;
+      const accounting = mockAccountingData;
+      const cashLedgerData = { data: [
+        { transaction_number: 'TXN-2024-001', transaction_type: 'Inflow', amount: 25000, counterparty: 'Client ABC', date_recorded: '2024-07-14T10:00:00Z' },
+        { transaction_number: 'TXN-2024-002', transaction_type: 'Outflow', amount: -8500, counterparty: 'Fournisseur XYZ', date_recorded: '2024-07-14T14:30:00Z' }
+      ]};
+      const debtAccountsData = { data: [
+        { account_number: 'DEBT-001', institution_name: 'Banque Centrale', principal_amount: 200000, outstanding_balance: 185000, interest_rate: 0.035 },
+        { account_number: 'DEBT-002', institution_name: 'Crédit Industriel', principal_amount: 150000, outstanding_balance: 142000, interest_rate: 0.041 }
+      ]};
 
-      const [finance, accounting, cashData, debtData] = await Promise.all([
-        financeRes.json(),
-        accountingRes.json(),
-        cashLedgerRes.json(),
-        debtAccountsRes.json()
-      ]);
-
-      setFinanceData(finance);
+      // Create chart-ready structure from finance data
+      const chartFinanceData = {
+        cash_flow_by_type: [
+          { transaction_type: 'Revenue', transaction_count: 150, total_amount: finance.total_cash_flow * 0.7 },
+          { transaction_type: 'Expenses', transaction_count: 120, total_amount: finance.total_cash_flow * 0.3 }
+        ],
+        monthly_cash_flow: [],
+        debt_summary: {
+          total_loans: 3,
+          total_principal: finance.total_debt,
+          total_outstanding: finance.total_debt,
+          avg_interest_rate: finance.interest_rate,
+          total_monthly_payments: finance.monthly_payments
+        }
+      };
+      
+      setFinanceData(chartFinanceData);
       setAccountingData(accounting);
-      setCashLedger(cashData.transactions || []);
-      setDebtAccounts(debtData.debts || []);
+      setCashLedger(cashLedgerData.data || []);
+      setDebtAccounts(debtAccountsData.data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load financial data');
       console.error('Failed to load financial data:', err);
@@ -321,10 +365,10 @@ const FinancialChartsFixed: React.FC<FinancialChartsProps> = ({ chartOptions, pi
       <div className="bg-blue-900/20 border border-blue-500 p-4 rounded-lg">
         <h4 className="text-blue-400 font-medium mb-2">Source des données</h4>
         <p className="text-blue-300 text-sm">
-          ✅ Connecté aux tables finance_cash_ledger, finance_debt_accounts, accounting_* • 
+          🔄 MOCK DATA ACTIVE - Données financières de démonstration • 
           {cashLedger.length > 0 && `${formatNumber(cashLedger.length)} transactions • `}
           {debtAccounts.length > 0 && `${formatNumber(debtAccounts.length)} comptes de dette • `}
-          Données manufacturières en temps réel
+          Prêt pour connexion manufacturière via port 8004 (auth en cours de résolution)
         </p>
       </div>
     </div>

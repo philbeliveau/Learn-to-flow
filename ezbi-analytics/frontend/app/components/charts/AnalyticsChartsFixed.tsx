@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Line, Bar, Pie, Doughnut } from 'react-chartjs-2';
 import { formatCurrency } from '../../services/syntheticDataService';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8003';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004';
 
 interface AnalyticsChartsProps {
   chartOptions: any;

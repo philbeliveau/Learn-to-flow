@@ -12,6 +12,8 @@ from datetime import datetime, timedelta
 import jwt
 import random
 import uvicorn
+import sqlite3
+import os
 
 # Create FastAPI app
 app = FastAPI(
@@ -32,6 +34,19 @@ app.add_middleware(
 # Security
 security = HTTPBearer()
 SECRET_KEY = "your-secret-key-here"
+
+# Database configuration
+DATABASE_PATH = "/Users/philippebeliveau/Desktop/Notebook/Learn-to-flow/data/ezbi_analytics.db"
+
+def get_db_connection():
+    """Get SQLite database connection"""
+    try:
+        conn = sqlite3.connect(DATABASE_PATH)
+        conn.row_factory = sqlite3.Row  # Enable column access by name
+        return conn
+    except Exception as e:
+        print(f"Database connection error: {e}")
+        return None
 
 # Models
 class LoginRequest(BaseModel):
@@ -259,83 +274,234 @@ async def get_manufacturing_dashboard(credentials: HTTPAuthorizationCredentials 
 # Manufacturing API endpoints for dashboard
 @app.get("/api/manufacturing/finance/kpis")
 async def get_finance_kpis(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Get finance KPIs from manufacturing data"""
+    """Get finance KPIs from real manufacturing data"""
     try:
         # Validate token
         payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=["HS256"])
         
+        conn = get_db_connection()
+        if not conn:
+            raise HTTPException(status_code=500, detail="Database connection failed")
+        
+        # Get real financial data from the database
+        cursor = conn.cursor()
+        
+        # Total cash flow from cash ledger
+        cursor.execute("SELECT SUM(amount) as total_cash FROM finance_cash_ledger WHERE amount > 0")
+        total_inflow = cursor.fetchone()[0] or 0
+        
+        cursor.execute("SELECT SUM(ABS(amount)) as total_cash FROM finance_cash_ledger WHERE amount < 0")
+        total_outflow = cursor.fetchone()[0] or 0
+        
+        # Total debt from debt accounts
+        cursor.execute("SELECT SUM(outstanding_amount) as total_debt FROM finance_debt_accounts")
+        total_debt = cursor.fetchone()[0] or 0
+        
+        # Monthly payments from debt accounts
+        cursor.execute("SELECT SUM(monthly_payment) as monthly_payments FROM finance_debt_accounts")
+        monthly_payments = cursor.fetchone()[0] or 0
+        
+        # Average interest rate
+        cursor.execute("SELECT AVG(interest_rate) as avg_rate FROM finance_debt_accounts")
+        avg_interest_rate = cursor.fetchone()[0] or 0
+        
+        conn.close()
+        
+        net_cash_flow = total_inflow - total_outflow
+        debt_ratio = total_debt / (total_inflow or 1) if total_inflow > 0 else 0
+        liquidity_ratio = total_inflow / (total_outflow or 1) if total_outflow > 0 else 0
+        
         return {
-            "total_cash_flow": round(450000 + random.uniform(-50000, 100000), 2),
-            "total_debt": round(280000 + random.uniform(-30000, 50000), 2),
-            "monthly_payments": round(8500 + random.uniform(-1000, 2000), 2),
-            "interest_rate": round(4.5 + random.uniform(-0.5, 1.0), 2),
-            "debt_ratio": round(0.62 + random.uniform(-0.1, 0.15), 3),
-            "liquidity_ratio": round(1.8 + random.uniform(-0.3, 0.5), 2)
+            "total_cash_flow": round(net_cash_flow, 2),
+            "total_debt": round(total_debt, 2),
+            "monthly_payments": round(monthly_payments, 2),
+            "interest_rate": round(avg_interest_rate, 2),
+            "debt_ratio": round(debt_ratio, 3),
+            "liquidity_ratio": round(liquidity_ratio, 2)
         }
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @app.get("/api/manufacturing/sales/kpis")
 async def get_sales_kpis(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Get sales KPIs from manufacturing data"""
+    """Get sales KPIs from real manufacturing data"""
     try:
         # Validate token
         payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=["HS256"])
         
+        conn = get_db_connection()
+        if not conn:
+            raise HTTPException(status_code=500, detail="Database connection failed")
+        
+        cursor = conn.cursor()
+        
+        # Total revenue from invoices
+        cursor.execute("SELECT SUM(amount) as total_revenue FROM sales_invoices")
+        total_revenue = cursor.fetchone()[0] or 0
+        
+        # Total invoice count
+        cursor.execute("SELECT COUNT(*) as total_invoices FROM sales_invoices")
+        total_invoices = cursor.fetchone()[0] or 0
+        
+        # Active customers count
+        cursor.execute("SELECT COUNT(*) as active_customers FROM sales_customers")
+        active_customers = cursor.fetchone()[0] or 0
+        
+        # Average invoice value
+        avg_invoice_value = total_revenue / total_invoices if total_invoices > 0 else 0
+        
+        # Growth rate (comparing recent vs older invoices)
+        cursor.execute("""
+            SELECT SUM(amount) as recent_revenue 
+            FROM sales_invoices 
+            WHERE date_issued >= date('now', '-30 days')
+        """)
+        recent_revenue = cursor.fetchone()[0] or 0
+        
+        cursor.execute("""
+            SELECT SUM(amount) as older_revenue 
+            FROM sales_invoices 
+            WHERE date_issued < date('now', '-30 days')
+        """)
+        older_revenue = cursor.fetchone()[0] or 0
+        
+        growth_rate = (recent_revenue - older_revenue) / older_revenue if older_revenue > 0 else 0
+        
+        # Conversion rate (paid vs total invoices)
+        cursor.execute("SELECT COUNT(*) as paid_invoices FROM sales_invoices WHERE status = 'Paid'")
+        paid_invoices = cursor.fetchone()[0] or 0
+        conversion_rate = paid_invoices / total_invoices if total_invoices > 0 else 0
+        
+        conn.close()
+        
         return {
-            "total_revenue": round(1200000 + random.uniform(-100000, 200000), 2),
-            "total_invoices": random.randint(180, 250),
-            "active_customers": random.randint(35, 55),
-            "avg_invoice_value": round(5500 + random.uniform(-500, 1000), 2),
-            "growth_rate": round(0.08 + random.uniform(-0.02, 0.05), 3),
-            "conversion_rate": round(0.24 + random.uniform(-0.05, 0.08), 3)
+            "total_revenue": round(total_revenue, 2),
+            "total_invoices": total_invoices,
+            "active_customers": active_customers,
+            "avg_invoice_value": round(avg_invoice_value, 2),
+            "growth_rate": round(growth_rate, 3),
+            "conversion_rate": round(conversion_rate, 3)
         }
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @app.get("/api/manufacturing/operations/kpis")
 async def get_operations_kpis(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Get operations KPIs from manufacturing data"""
+    """Get operations KPIs from real manufacturing data"""
     try:
         # Validate token
         payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=["HS256"])
         
+        conn = get_db_connection()
+        if not conn:
+            raise HTTPException(status_code=500, detail="Database connection failed")
+        
+        cursor = conn.cursor()
+        
+        # Total production orders
+        cursor.execute("SELECT COUNT(*) as total_orders FROM operations_production_orders")
+        total_production_orders = cursor.fetchone()[0] or 0
+        
+        # Completed orders
+        cursor.execute("SELECT COUNT(*) as completed_orders FROM operations_production_orders WHERE status = 'completed'")
+        completed_orders = cursor.fetchone()[0] or 0
+        
+        # Efficiency rate (completed vs total)
+        efficiency_rate = completed_orders / total_production_orders if total_production_orders > 0 else 0
+        
+        # Average base cost for products
+        cursor.execute("SELECT AVG(base_cost) as avg_cost FROM operations_products")
+        avg_cost = cursor.fetchone()[0] or 0
+        
+        # Products count
+        cursor.execute("SELECT COUNT(*) as total_products FROM operations_products")
+        total_products = cursor.fetchone()[0] or 0
+        
+        # Calculate capacity utilization based on orders vs products
+        capacity_utilization = total_production_orders / (total_products * 5) if total_products > 0 else 0
+        
+        conn.close()
+        
         return {
-            "total_production_orders": random.randint(25, 45),
-            "completed_orders": random.randint(20, 35),
-            "efficiency_rate": round(0.85 + random.uniform(-0.1, 0.12), 3),
-            "defect_rate": round(0.02 + random.uniform(-0.01, 0.015), 4),
-            "capacity_utilization": round(0.78 + random.uniform(-0.1, 0.15), 3),
-            "avg_cycle_time": round(24 + random.uniform(-4, 8), 1)
+            "total_production_orders": total_production_orders,
+            "completed_orders": completed_orders,
+            "efficiency_rate": round(efficiency_rate, 3),
+            "defect_rate": round(0.02, 4),  # Static for now, would need defect tracking
+            "capacity_utilization": round(min(capacity_utilization, 1.0), 3),
+            "avg_cycle_time": round(24.0, 1),  # Static for now, would need time tracking
+            "avg_product_cost": round(avg_cost, 2),
+            "total_products": total_products
         }
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @app.get("/api/manufacturing/overview/kpis")
 async def get_overview_kpis(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Get overview KPIs from all manufacturing tables"""
+    """Get overview KPIs from all real manufacturing tables"""
     try:
         # Validate token
         payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=["HS256"])
         
+        conn = get_db_connection()
+        if not conn:
+            raise HTTPException(status_code=500, detail="Database connection failed")
+        
+        cursor = conn.cursor()
+        
+        # Count records across all tables
+        tables = [
+            'sales_customers', 'sales_invoices', 'accounting_vendors', 
+            'accounting_accounts_receivable', 'accounting_purchases', 'accounting_accounts_payable',
+            'operations_products', 'operations_production_orders', 'finance_cash_ledger', 
+            'finance_debt_accounts', 'expenses_fixed_costs', 'hr_employees', 'hr_payroll_log'
+        ]
+        
+        total_records = 0
+        table_counts = {}
+        
+        for table in tables:
+            cursor.execute(f"SELECT COUNT(*) FROM {table}")
+            count = cursor.fetchone()[0]
+            table_counts[table] = count
+            total_records += count
+        
+        # Calculate data quality score based on non-null values in key tables
+        cursor.execute("SELECT COUNT(*) FROM sales_invoices WHERE amount IS NOT NULL AND amount > 0")
+        valid_invoices = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM sales_invoices")
+        total_invoices = cursor.fetchone()[0]
+        
+        data_quality_score = (valid_invoices / total_invoices * 100) if total_invoices > 0 else 100
+        
+        conn.close()
+        
         return {
-            "total_records": random.randint(2800, 3200),
-            "active_tables": 13,
-            "data_quality_score": round(92 + random.uniform(-5, 8), 1),
+            "total_records": total_records,
+            "active_tables": len(tables),
+            "data_quality_score": round(data_quality_score, 1),
             "last_updated": datetime.now().isoformat(),
             "system_health": "operational",
-            "cache_hit_rate": round(0.89 + random.uniform(-0.05, 0.1), 3)
+            "table_counts": table_counts,
+            "database_status": "connected"
         }
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 # Health check
 @app.get("/health")
