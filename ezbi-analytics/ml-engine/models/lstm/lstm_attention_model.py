@@ -279,7 +279,7 @@ class AttentionLSTMModel(BaseEstimator, RegressorMixin):
         y_train, y_val = y_seq[:split_idx], y_seq[split_idx:]
         
         # Build model
-        self.model = self._build_model(input_shape=(self.sequence_length, X.shape[1]))\n        
+        self.model = self._build_model(input_shape=(self.sequence_length, X.shape[1]))
         self.logger.info(f"Model architecture: {self.model.summary()}")
         
         # Create callbacks

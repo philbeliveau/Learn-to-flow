@@ -1,0 +1,49 @@
+# Manufacturing Data Simulator - Python Dependencies
+# Railway Deployment Requirements
+
+# Core Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# Database
+asyncpg==0.29.0
+sqlalchemy==2.0.23
+alembic==1.13.0
+
+# Scheduling & Background Tasks
+apscheduler==3.10.4
+
+# Data Processing & Excel Export
+pandas==2.1.4
+openpyxl==3.1.2
+xlsxwriter==3.1.9
+
+# HTTP Requests (for Slack notifications)
+httpx==0.25.2
+aiohttp==3.9.1
+
+# Date/Time Utilities
+python-dateutil==2.8.2
+
+# Environment & Configuration
+python-dotenv==1.0.0
+
+# Logging & Monitoring
+structlog==23.2.0
+
+# Data Validation & Serialization
+marshmallow==3.20.1
+
+# Numerical Computing
+numpy==1.24.4
+
+# Development & Testing (optional for production)
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# Security
+python-multipart==0.0.6
+
+# CORS Support
+python-cors==1.7.0

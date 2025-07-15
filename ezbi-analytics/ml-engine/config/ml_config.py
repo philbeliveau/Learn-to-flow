@@ -219,7 +219,12 @@ class MLEngineConfig:
         
         holiday_dates = []
         for year in range(current_year, current_year + 2):
-            holiday_dates.extend(list(france_holidays[year].keys()))
+            year_holidays = france_holidays[year]
+            if hasattr(year_holidays, 'keys'):
+                holiday_dates.extend(list(year_holidays.keys()))
+            else:
+                # Handle case where year_holidays is not a dict
+                holiday_dates.extend([date for date in year_holidays if isinstance(date, datetime)])
         
         return holiday_dates
     

@@ -48,7 +48,7 @@ const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeTab, onTabC
     },
     {
       id: 'predictions',
-      name: 'Prédictions',
+      name: 'Cash Flow IA',
       icon: (
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
           <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L3.5 15.49z"/>
@@ -106,16 +106,16 @@ const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeTab, onTabC
       <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/20">
         <div className="space-y-2 text-xs font-light text-white/60">
           <div className="flex justify-between">
-            <span>Cash Flow:</span>
+            <span>PostgreSQL:</span>
             <span>203K+</span>
           </div>
           <div className="flex justify-between">
-            <span>Capteurs:</span>
-            <span>14K+</span>
+            <span>Excel Planning:</span>
+            <span>Live</span>
           </div>
           <div className="flex justify-between">
-            <span>Entreprises:</span>
-            <span>4.7K+</span>
+            <span>Prédictions IA:</span>
+            <span>ML</span>
           </div>
         </div>
       </div>

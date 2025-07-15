@@ -33,7 +33,7 @@ import NavigationSidebar from './NavigationSidebar';
 import OverviewCharts from './charts/OverviewCharts';
 import FinancialCharts from './charts/FinancialCharts';
 import ManufacturingCharts from './charts/ManufacturingCharts';
-import PredictionsCharts from './charts/PredictionsCharts';
+import CashFlowPredictionDashboard from './charts/CashFlowPredictionDashboard';
 import AnalyticsCharts from './charts/AnalyticsCharts';
 
 interface DashboardProps {
@@ -211,11 +211,9 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
       case 'manufacturing':
         return <ManufacturingCharts chartOptions={chartOptions} />;
       case 'predictions':
-        return <PredictionsCharts 
+        return <CashFlowPredictionDashboard 
           chartOptions={chartOptions} 
-          prediction={prediction} 
-          generatePrediction={generatePrediction}
-          loading={loading}
+          pieChartOptions={pieChartOptions}
         />;
       case 'analytics':
         return <AnalyticsCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;

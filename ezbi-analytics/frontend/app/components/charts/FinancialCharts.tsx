@@ -11,11 +11,15 @@ interface FinancialChartsProps {
 const FinancialCharts: React.FC<FinancialChartsProps> = ({ chartOptions, pieChartOptions }) => {
   const [cashFlowData, setCashFlowData] = useState<any>(null);
   const [bankingData, setBankingData] = useState<any>(null);
+  const [currentPosition, setCurrentPosition] = useState<any>(null);
+  const [quickPrediction, setQuickPrediction] = useState<any>(null);
   const [timeframe, setTimeframe] = useState('6M');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadFinancialData();
+    loadCurrentPosition();
+    loadQuickPrediction();
   }, [timeframe]);
 
   const loadFinancialData = async () => {
@@ -52,6 +56,58 @@ const FinancialCharts: React.FC<FinancialChartsProps> = ({ chartOptions, pieChar
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadCurrentPosition = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
+
+      const response = await fetch(
+        'http://localhost:8000/api/v1/current-cash-position',
+        { headers }
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentPosition(data);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement de la position actuelle:', error);
+    }
+  };
+
+  const loadQuickPrediction = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
+
+      const response = await fetch(
+        'http://localhost:8000/api/v1/quick-prediction?days=30',
+        { headers }
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        setQuickPrediction(data);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement de la prédiction rapide:', error);
+    }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('fr-FR', { 
+      style: 'currency', 
+      currency: 'EUR',
+      minimumFractionDigits: 0
+    }).format(amount);
   };
 
   if (loading) {
@@ -157,6 +213,144 @@ const FinancialCharts: React.FC<FinancialChartsProps> = ({ chartOptions, pieChar
               </p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Enhanced Cash Flow Analysis */}
+      {currentPosition && (
+        <div className="bg-black border border-white/20 p-8">
+          <h3 className="text-xl font-light text-white mb-6">Position de Trésorerie Actuelle</h3>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="space-y-2">
+              <h4 className="text-sm font-light text-white/70">Solde Actuel</h4>
+              <p className="text-2xl font-light text-white">
+                {formatCurrency(currentPosition.current_position?.cash_balance || 0)}
+              </p>
+              <p className="text-xs font-light text-white/60">Position immédiate</p>
+            </div>
+            
+            <div className="space-y-2">
+              <h4 className="text-sm font-light text-white/70">Créances</h4>
+              <p className="text-2xl font-light" style={{color: '#74a6be'}}>
+                {formatCurrency(currentPosition.current_position?.outstanding_receivables || 0)}
+              </p>
+              <p className="text-xs font-light text-white/60">À encaisser</p>
+            </div>
+            
+            <div className="space-y-2">
+              <h4 className="text-sm font-light text-white/70">Dettes</h4>
+              <p className="text-2xl font-light" style={{color: '#a7292e'}}>
+                {formatCurrency(currentPosition.current_position?.outstanding_payables || 0)}
+              </p>
+              <p className="text-xs font-light text-white/60">À payer</p>
+            </div>
+            
+            <div className="space-y-2">
+              <h4 className="text-sm font-light text-white/70">BFR Net</h4>
+              <p className="text-2xl font-light text-white">
+                {formatCurrency(currentPosition.current_position?.net_working_capital || 0)}
+              </p>
+              <p className="text-xs font-light text-white/60">Besoin fonds roulement</p>
+            </div>
+          </div>
+          
+          {currentPosition.today_activity && (
+            <div className="mt-6 pt-6 border-t border-white/20">
+              <h4 className="text-lg font-light text-white mb-4">Activité Aujourd'hui</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-light text-white/70">Entrées:</span>
+                  <span className="text-lg font-light" style={{color: '#10B981'}}>
+                    {formatCurrency(currentPosition.today_activity.inflows)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-light text-white/70">Sorties:</span>
+                  <span className="text-lg font-light" style={{color: '#EF4444'}}>
+                    {formatCurrency(currentPosition.today_activity.outflows)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-light text-white/70">Net:</span>
+                  <span className="text-lg font-light text-white">
+                    {formatCurrency(currentPosition.today_activity.net_flow)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Quick Cash Flow Prediction */}
+      {quickPrediction && (
+        <div className="bg-black border border-white/20 p-8">
+          <h3 className="text-xl font-light text-white mb-6">Prédiction Cash Flow (30j)</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div className="border border-white/30 p-4">
+                <h4 className="text-sm font-light text-white/70 mb-2">Résumé Prédiction</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-sm font-light text-white/70">Entrées prévues:</span>
+                    <span className="text-lg font-light" style={{color: '#10B981'}}>
+                      {formatCurrency(quickPrediction.summary?.total_predicted_inflows || 0)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-light text-white/70">Sorties prévues:</span>
+                    <span className="text-lg font-light" style={{color: '#EF4444'}}>
+                      {formatCurrency(quickPrediction.summary?.total_predicted_outflows || 0)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-white/20">
+                    <span className="text-sm font-light text-white/70">Flux net prévu:</span>
+                    <span className="text-xl font-light text-white">
+                      {formatCurrency(quickPrediction.summary?.net_cash_flow || 0)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border border-white/30 p-4">
+                <h4 className="text-sm font-light text-white/70 mb-2">Solde Fin de Période</h4>
+                <p className="text-3xl font-light text-white">
+                  {formatCurrency(quickPrediction.summary?.ending_balance || 0)}
+                </p>
+                <p className="text-xs font-light text-white/60 mt-1">
+                  Projection {quickPrediction.period || '30 jours'}
+                </p>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              {quickPrediction.risk_factors && quickPrediction.risk_factors.length > 0 && (
+                <div className="border border-red-500/30 p-4 bg-red-500/5">
+                  <h4 className="text-sm font-light text-red-400 mb-2">Facteurs de Risque</h4>
+                  <div className="space-y-2">
+                    {quickPrediction.risk_factors.slice(0, 2).map((risk: any, idx: number) => (
+                      <div key={idx} className="text-sm font-light text-white/70">
+                        • {risk.description || risk}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {quickPrediction.key_insights && quickPrediction.key_insights.length > 0 && (
+                <div className="border border-blue-500/30 p-4 bg-blue-500/5">
+                  <h4 className="text-sm font-light text-blue-400 mb-2">Insights Clés</h4>
+                  <div className="space-y-2">
+                    {quickPrediction.key_insights.slice(0, 2).map((insight: any, idx: number) => (
+                      <div key={idx} className="text-sm font-light text-white/70">
+                        • {insight.description || insight}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
