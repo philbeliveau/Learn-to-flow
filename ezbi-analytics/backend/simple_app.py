@@ -32,6 +32,7 @@ class LoginRequest(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    user: dict
 
 class PredictionRequest(BaseModel):
     revenue: float
@@ -60,9 +61,25 @@ async def health_check():
 # Authentication
 @app.post("/api/v1/auth/login", response_model=TokenResponse)
 async def login(credentials: LoginRequest):
-    """Demo login - accepts demo@ezbi.fr / demo123"""
-    if credentials.email == "demo@ezbi.fr" and credentials.password == "demo123":
-        return TokenResponse(access_token="demo_token_ezbi_2024")
+    """Demo login - accepts multiple demo credentials"""
+    valid_credentials = [
+        ("demo@ezbi.fr", "demo123"),
+        ("admin@ezbi.com", "admin"),
+        ("user@ezbi.com", "password"),
+        ("demo@ezbi.com", "demo")
+    ]
+    
+    if (credentials.email, credentials.password) in valid_credentials:
+        return TokenResponse(
+            access_token="demo_token_ezbi_2024",
+            user={
+                "id": 1,
+                "email": credentials.email,
+                "name": "Demo User",
+                "company": "EZBI Analytics",
+                "role": "admin"
+            }
+        )
     
     raise HTTPException(status_code=401, detail="Invalid credentials")
 
@@ -161,12 +178,12 @@ async def upload_financial_data():
 
 if __name__ == "__main__":
     print("🚀 Starting EZBI Analytics API Demo")
-    print("📊 Access API docs at: http://localhost:8001/docs")
+    print("📊 Access API docs at: http://localhost:8000/docs")
     print("🏭 Demo credentials: demo@ezbi.fr / demo123")
     
     uvicorn.run(
         "simple_app:app",
         host="0.0.0.0",
-        port=8001,
+        port=8000,
         reload=True
     )

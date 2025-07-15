@@ -95,6 +95,10 @@ class ModelManager:
         self.feature_engines = {}
         self.model_metadata = {}
         
+        # Setup logging first
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
+        
         # Cache for predictions
         self.redis_client = self._initialize_redis()
         
@@ -104,10 +108,6 @@ class ModelManager:
         # Model refresh thread
         self.refresh_thread = None
         self.refresh_interval = 3600  # 1 hour
-        
-        # Setup logging
-        logging.basicConfig(level=logging.INFO)
-        self.logger = logging.getLogger(__name__)
         
         # Load models
         self._load_all_models()
