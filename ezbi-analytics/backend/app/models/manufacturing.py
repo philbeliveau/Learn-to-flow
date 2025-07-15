@@ -1,212 +1,322 @@
 """
-Database models for manufacturing and cash flow data.
+Manufacturing Schema Models
+Complete PostgreSQL schema implementation for manufacturing business intelligence
 """
 
-from sqlalchemy import Column, Integer, String, Float, DateTime, JSON, Text, Boolean, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, Numeric, Date, DateTime, Boolean, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from sqlalchemy.schema import CheckConstraint
+
 from app.core.database import Base
-import uuid
-from datetime import datetime
 
-class ManufacturingData(Base):
-    """Model for manufacturing process data."""
-    __tablename__ = "manufacturing_data"
-    
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    timestamp = Column(DateTime, nullable=False, index=True)
-    machine_id = Column(String, nullable=False, index=True)
-    
-    # Production metrics
-    production_quantity = Column(Float, default=0)
-    quality_score = Column(Float, default=0)  # 0-100
-    efficiency = Column(Float, default=0)  # 0-100
-    
-    # Operational metrics
-    energy_consumption = Column(Float, default=0)  # kWh
-    maintenance_indicator = Column(Float, default=0)  # 0-100
-    
-    # Sensor data
-    temperature = Column(Float, default=0)
-    pressure = Column(Float, default=0)
-    vibration = Column(Float, default=0)
-    
-    # Raw sensor data (JSON)
-    raw_data = Column(JSON)
-    
-    # Metadata
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-    
-    def __repr__(self):
-        return f"<ManufacturingData(id={self.id}, machine={self.machine_id}, timestamp={self.timestamp})>"
+# ===============================
+# SALES SCHEMA
+# ===============================
 
-class CashFlowData(Base):
-    """Model for cash flow data."""
-    __tablename__ = "cash_flow_data"
+class Customer(Base):
+    __tablename__ = "customers"
+    __table_args__ = {"schema": "sales"}
     
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    date = Column(DateTime, nullable=False, index=True)
-    company_identifier = Column(String, nullable=False, index=True)
+    customer_id = Column(Integer, primary_key=True, index=True)
+    company_name = Column(String(255), nullable=False)
+    contact_name = Column(String(255))
+    email = Column(String(255))
+    phone = Column(String(50))
+    address = Column(Text)
+    payment_terms = Column(Integer, default=30)  # Net-30
+    credit_limit = Column(Numeric(12, 2), default=50000.00)
+    created_at = Column(DateTime, server_default=func.now())
     
-    # Cash flow components
-    net_cash_flow = Column(Float, default=0)
-    operating_cash_flow = Column(Float, default=0)
-    investment_cash_flow = Column(Float, default=0)
-    financing_cash_flow = Column(Float, default=0)
-    
-    # Growth and ratios
-    cash_flow_growth_rate = Column(Float, default=0)
-    operating_ratio = Column(Float, default=0)
-    investment_ratio = Column(Float, default=0)
-    financing_ratio = Column(Float, default=0)
-    
-    # Metadata
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-    
-    def __repr__(self):
-        return f"<CashFlowData(id={self.id}, company={self.company_identifier}, date={self.date})>"
+    # Relationships
+    invoices = relationship("Invoice", back_populates="customer")
+    production_orders = relationship("ProductionOrder", back_populates="customer")
+    accounts_receivable = relationship("AccountsReceivable", back_populates="customer")
 
-class PredictionResult(Base):
-    """Model for ML prediction results."""
-    __tablename__ = "prediction_results"
+class Invoice(Base):
+    __tablename__ = "invoices"
+    __table_args__ = (
+        CheckConstraint("status IN ('Open', 'Paid', 'Overdue', 'Partial')", name="invoice_status_check"),
+        {"schema": "sales"}
+    )
     
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    model_id = Column(String, nullable=False, index=True)
-    model_name = Column(String, nullable=False)
-    model_version = Column(String, default="1.0")
+    invoice_id = Column(Integer, primary_key=True, index=True)
+    customer_id = Column(Integer, ForeignKey("sales.customers.customer_id"), nullable=False)
+    invoice_number = Column(String(50), unique=True, nullable=False)
+    date_issued = Column(Date, nullable=False)
+    due_date = Column(Date, nullable=False)
+    amount = Column(Numeric(12, 2), nullable=False)
+    status = Column(String(20), default="Open")
+    payment_date = Column(Date)
+    created_at = Column(DateTime, server_default=func.now())
     
-    # Prediction details
-    prediction_type = Column(String, nullable=False)  # 'cash_flow', 'quality', 'maintenance'
-    prediction_horizon = Column(Integer, default=30)  # days
-    confidence_score = Column(Float, default=0)  # 0-1
-    
-    # Input and output data
-    input_data = Column(JSON)
-    prediction_value = Column(Float)
-    prediction_data = Column(JSON)  # Detailed prediction results
-    
-    # Feature importance and explanations
-    feature_importance = Column(JSON)
-    explanation = Column(Text)
-    
-    # Processing metadata
-    processing_time_ms = Column(Integer, default=0)
-    timestamp = Column(DateTime, default=func.now())
-    
-    # User context
-    user_id = Column(String, ForeignKey("users.id"), nullable=True)
-    company_id = Column(String, nullable=True)
-    
-    # Metadata
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-    
-    def __repr__(self):
-        return f"<PredictionResult(id={self.id}, type={self.prediction_type}, confidence={self.confidence_score})>"
+    # Relationships
+    customer = relationship("Customer", back_populates="invoices")
+    accounts_receivable = relationship("AccountsReceivable", back_populates="invoice")
 
-class MLModel(Base):
-    """Model for ML model metadata."""
-    __tablename__ = "ml_models"
+# ===============================
+# ACCOUNTING SCHEMA
+# ===============================
+
+class AccountsReceivable(Base):
+    __tablename__ = "accounts_receivable"
+    __table_args__ = (
+        CheckConstraint("aging_bucket IN ('0-30', '31-60', '61-90', '90+')", name="ar_aging_check"),
+        {"schema": "accounting"}
+    )
     
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    name = Column(String, nullable=False)
-    version = Column(String, nullable=False)
-    model_type = Column(String, nullable=False)  # 'prophet', 'lstm', 'ensemble'
+    ar_id = Column(Integer, primary_key=True, index=True)
+    invoice_id = Column(Integer, ForeignKey("sales.invoices.invoice_id"), nullable=False)
+    customer_id = Column(Integer, ForeignKey("sales.customers.customer_id"), nullable=False)
+    amount_outstanding = Column(Numeric(12, 2), nullable=False)
+    days_outstanding = Column(Integer, nullable=False)
+    aging_bucket = Column(String(20), nullable=False)
+    as_of_date = Column(Date, nullable=False)
+    created_at = Column(DateTime, server_default=func.now())
     
-    # Model configuration
-    hyperparameters = Column(JSON)
-    feature_columns = Column(JSON)
-    target_column = Column(String)
+    # Relationships
+    invoice = relationship("Invoice", back_populates="accounts_receivable")
+    customer = relationship("Customer", back_populates="accounts_receivable")
+
+class Vendor(Base):
+    __tablename__ = "vendors"
+    __table_args__ = {"schema": "accounting"}
     
-    # Performance metrics
-    accuracy = Column(Float, default=0)
-    mse = Column(Float, default=0)
-    mae = Column(Float, default=0)
-    r2_score = Column(Float, default=0)
+    vendor_id = Column(Integer, primary_key=True, index=True)
+    vendor_name = Column(String(255), nullable=False)
+    contact_name = Column(String(255))
+    email = Column(String(255))
+    phone = Column(String(50))
+    payment_terms = Column(Integer, default=30)  # Net-30
+    vendor_type = Column(String(50), nullable=False)  # Steel, Tools, Maintenance, Software
     
-    # Model status
-    status = Column(String, default="training")  # 'training', 'active', 'deprecated'
-    training_data_size = Column(Integer, default=0)
-    training_start_time = Column(DateTime)
-    training_end_time = Column(DateTime)
+    # Relationships
+    purchases = relationship("Purchase", back_populates="vendor")
+    accounts_payable = relationship("AccountsPayable", back_populates="vendor")
+    fixed_costs = relationship("FixedCost", back_populates="vendor")
+
+class Purchase(Base):
+    __tablename__ = "purchases"
+    __table_args__ = (
+        CheckConstraint("payment_status IN ('Outstanding', 'Paid', 'Partial')", name="purchase_payment_check"),
+        {"schema": "accounting"}
+    )
     
-    # Model artifacts (paths to saved models)
-    model_path = Column(String)
-    scaler_path = Column(String)
-    
-    # Metadata
+    purchase_id = Column(Integer, primary_key=True, index=True)
+    vendor_id = Column(Integer, ForeignKey("accounting.vendors.vendor_id"), nullable=False)
+    purchase_number = Column(String(50), unique=True, nullable=False)
+    category = Column(String(50), nullable=False)  # Raw Materials, Tools, Repairs, Software
+    amount = Column(Numeric(12, 2), nullable=False)
+    date_purchased = Column(Date, nullable=False)
+    due_date = Column(Date, nullable=False)
+    payment_status = Column(String(20), default="Outstanding")
+    payment_date = Column(Date)
     description = Column(Text)
-    created_by = Column(String, ForeignKey("users.id"), nullable=True)
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    created_at = Column(DateTime, server_default=func.now())
     
-    def __repr__(self):
-        return f"<MLModel(id={self.id}, name={self.name}, version={self.version}, status={self.status})>"
+    # Relationships
+    vendor = relationship("Vendor", back_populates="purchases")
+    accounts_payable = relationship("AccountsPayable", back_populates="purchase")
 
-class DataUpload(Base):
-    """Model for tracking data uploads."""
-    __tablename__ = "data_uploads"
+class AccountsPayable(Base):
+    __tablename__ = "accounts_payable"
+    __table_args__ = {"schema": "accounting"}
     
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    filename = Column(String, nullable=False)
-    file_size = Column(Integer, default=0)
-    file_type = Column(String, nullable=False)  # 'csv', 'xlsx', 'json'
+    ap_id = Column(Integer, primary_key=True, index=True)
+    purchase_id = Column(Integer, ForeignKey("accounting.purchases.purchase_id"), nullable=False)
+    vendor_id = Column(Integer, ForeignKey("accounting.vendors.vendor_id"), nullable=False)
+    amount_outstanding = Column(Numeric(12, 2), nullable=False)
+    due_date = Column(Date, nullable=False)
+    days_until_due = Column(Integer, nullable=False)
+    created_at = Column(DateTime, server_default=func.now())
     
-    # Upload metadata
-    upload_status = Column(String, default="processing")  # 'processing', 'completed', 'failed'
-    records_count = Column(Integer, default=0)
-    errors_count = Column(Integer, default=0)
-    
-    # Processing results
-    validation_results = Column(JSON)
-    processing_log = Column(Text)
-    
-    # User context
-    user_id = Column(String, ForeignKey("users.id"), nullable=False)
-    company_id = Column(String, nullable=True)
-    
-    # Metadata
-    uploaded_at = Column(DateTime, default=func.now())
-    processed_at = Column(DateTime, nullable=True)
-    
-    def __repr__(self):
-        return f"<DataUpload(id={self.id}, filename={self.filename}, status={self.upload_status})>"
+    # Relationships
+    purchase = relationship("Purchase", back_populates="accounts_payable")
+    vendor = relationship("Vendor", back_populates="accounts_payable")
 
-class KPI(Base):
-    """Model for Key Performance Indicators."""
-    __tablename__ = "kpis"
+# ===============================
+# OPERATIONS SCHEMA
+# ===============================
+
+class Product(Base):
+    __tablename__ = "products"
+    __table_args__ = {"schema": "operations"}
     
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    name = Column(String, nullable=False)
-    category = Column(String, nullable=False)  # 'production', 'quality', 'financial', 'maintenance'
+    product_id = Column(Integer, primary_key=True, index=True)
+    product_code = Column(String(50), unique=True, nullable=False)
+    product_name = Column(String(255), nullable=False)
+    base_cost = Column(Numeric(10, 2), nullable=False)
+    labor_hours = Column(Numeric(5, 2), nullable=False)
+    material_cost = Column(Numeric(10, 2), nullable=False)
     
-    # KPI configuration
-    calculation_method = Column(String, nullable=False)
-    target_value = Column(Float, nullable=True)
-    unit = Column(String, default="")
+    # Relationships
+    production_orders = relationship("ProductionOrder", back_populates="product")
+
+class ProductionOrder(Base):
+    __tablename__ = "production_orders"
+    __table_args__ = (
+        CheckConstraint("status IN ('Planned', 'In Progress', 'Completed', 'On Hold')", name="production_status_check"),
+        {"schema": "operations"}
+    )
     
-    # Current value and trends
-    current_value = Column(Float, default=0)
-    previous_value = Column(Float, default=0)
-    trend_direction = Column(String, default="stable")  # 'up', 'down', 'stable'
+    order_id = Column(Integer, primary_key=True, index=True)
+    order_number = Column(String(50), unique=True, nullable=False)
+    product_id = Column(Integer, ForeignKey("operations.products.product_id"), nullable=False)
+    customer_id = Column(Integer, ForeignKey("sales.customers.customer_id"), nullable=False)
+    start_date = Column(Date, nullable=False)
+    completion_date = Column(Date)
+    expected_completion = Column(Date, nullable=False)
+    status = Column(String(20), default="In Progress")
+    units_ordered = Column(Integer, nullable=False)
+    units_produced = Column(Integer, default=0)
+    cost_of_goods_sold = Column(Numeric(12, 2))
+    labor_cost = Column(Numeric(10, 2))
+    material_cost = Column(Numeric(10, 2))
+    created_at = Column(DateTime, server_default=func.now())
     
-    # Thresholds
-    warning_threshold = Column(Float, nullable=True)
-    critical_threshold = Column(Float, nullable=True)
+    # Relationships
+    product = relationship("Product", back_populates="production_orders")
+    customer = relationship("Customer", back_populates="production_orders")
+
+# ===============================
+# FINANCE SCHEMA
+# ===============================
+
+class CashLedger(Base):
+    __tablename__ = "cash_ledger"
+    __table_args__ = {"schema": "finance"}
     
-    # Update metadata
-    last_calculated = Column(DateTime, default=func.now())
-    calculation_frequency = Column(String, default="daily")  # 'hourly', 'daily', 'weekly'
+    transaction_id = Column(Integer, primary_key=True, index=True)
+    transaction_number = Column(String(50), unique=True, nullable=False)
+    date_recorded = Column(Date, nullable=False)
+    amount = Column(Numeric(12, 2), nullable=False)  # Positive = inflow, Negative = outflow
+    transaction_type = Column(String(50), nullable=False)  # Sale, Purchase, Payroll, Loan, Interest
+    counterparty = Column(String(255))  # Customer/Vendor/Employee name
+    reference_id = Column(Integer)  # Links to invoice_id, purchase_id, etc.
+    reference_type = Column(String(50))  # invoice, purchase, payroll, loan
+    description = Column(Text)
+    running_balance = Column(Numeric(15, 2))
+    created_at = Column(DateTime, server_default=func.now())
+
+class DebtAccount(Base):
+    __tablename__ = "debt_accounts"
+    __table_args__ = (
+        CheckConstraint("status IN ('Active', 'Paid Off', 'Default')", name="debt_status_check"),
+        {"schema": "finance"}
+    )
     
-    # User context
-    company_id = Column(String, nullable=True)
+    loan_id = Column(Integer, primary_key=True, index=True)
+    loan_number = Column(String(50), unique=True, nullable=False)
+    loan_type = Column(String(50), nullable=False)  # Working Capital, Credit Line, Equipment
+    principal_amount = Column(Numeric(15, 2), nullable=False)
+    outstanding_amount = Column(Numeric(15, 2), nullable=False)
+    interest_rate = Column(Numeric(5, 4), nullable=False)  # 0.0750 = 7.5%
+    monthly_payment = Column(Numeric(10, 2))
+    last_payment_date = Column(Date)
+    next_due_date = Column(Date)
+    loan_start_date = Column(Date, nullable=False)
+    loan_end_date = Column(Date)
+    status = Column(String(20), default="Active")
     
-    # Metadata
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    # Relationships
+    debt_payments = relationship("DebtPayment", back_populates="debt_account")
+
+class DebtPayment(Base):
+    __tablename__ = "debt_payments"
+    __table_args__ = {"schema": "finance"}
     
-    def __repr__(self):
-        return f"<KPI(id={self.id}, name={self.name}, value={self.current_value})>"
+    payment_id = Column(Integer, primary_key=True, index=True)
+    loan_id = Column(Integer, ForeignKey("finance.debt_accounts.loan_id"), nullable=False)
+    payment_date = Column(Date, nullable=False)
+    principal_payment = Column(Numeric(10, 2), nullable=False)
+    interest_payment = Column(Numeric(10, 2), nullable=False)
+    total_payment = Column(Numeric(10, 2), nullable=False)
+    remaining_balance = Column(Numeric(15, 2), nullable=False)
+    
+    # Relationships
+    debt_account = relationship("DebtAccount", back_populates="debt_payments")
+
+# ===============================
+# EXPENSES SCHEMA
+# ===============================
+
+class FixedCost(Base):
+    __tablename__ = "fixed_costs"
+    __table_args__ = (
+        CheckConstraint("frequency IN ('Monthly', 'Quarterly', 'Annual')", name="fixed_cost_frequency_check"),
+        {"schema": "expenses"}
+    )
+    
+    expense_id = Column(Integer, primary_key=True, index=True)
+    expense_name = Column(String(255), nullable=False)
+    category = Column(String(50), nullable=False)  # Rent, Utilities, Software, Insurance
+    amount = Column(Numeric(10, 2), nullable=False)
+    frequency = Column(String(20), nullable=False)  # Monthly, Quarterly, Annual
+    due_day = Column(Integer)  # Day of month (1-31)
+    last_paid_date = Column(Date)
+    next_due_date = Column(Date)
+    vendor_id = Column(Integer, ForeignKey("accounting.vendors.vendor_id"))
+    auto_pay = Column(Boolean, default=False)
+    
+    # Relationships
+    vendor = relationship("Vendor", back_populates="fixed_costs")
+    expense_logs = relationship("ExpenseLog", back_populates="fixed_cost")
+
+class ExpenseLog(Base):
+    __tablename__ = "expense_log"
+    __table_args__ = {"schema": "expenses"}
+    
+    log_id = Column(Integer, primary_key=True, index=True)
+    expense_id = Column(Integer, ForeignKey("expenses.fixed_costs.expense_id"), nullable=False)
+    amount_paid = Column(Numeric(10, 2), nullable=False)
+    date_paid = Column(Date, nullable=False)
+    payment_method = Column(String(50))
+    notes = Column(Text)
+    
+    # Relationships
+    fixed_cost = relationship("FixedCost", back_populates="expense_logs")
+
+# ===============================
+# HR SCHEMA
+# ===============================
+
+class Employee(Base):
+    __tablename__ = "employees"
+    __table_args__ = (
+        CheckConstraint("status IN ('Active', 'Terminated', 'On Leave')", name="employee_status_check"),
+        CheckConstraint("pay_frequency IN ('Bi-weekly', 'Monthly')", name="employee_pay_frequency_check"),
+        {"schema": "hr"}
+    )
+    
+    employee_id = Column(Integer, primary_key=True, index=True)
+    employee_number = Column(String(20), unique=True, nullable=False)
+    first_name = Column(String(100), nullable=False)
+    last_name = Column(String(100), nullable=False)
+    department = Column(String(50), nullable=False)  # Assembly, Logistics, Admin, Management
+    position = Column(String(100), nullable=False)
+    hire_date = Column(Date, nullable=False)
+    annual_salary = Column(Numeric(10, 2), nullable=False)
+    pay_frequency = Column(String(20), default="Bi-weekly")
+    status = Column(String(20), default="Active")
+    
+    # Relationships
+    payroll_logs = relationship("PayrollLog", back_populates="employee")
+
+class PayrollLog(Base):
+    __tablename__ = "payroll_log"
+    __table_args__ = {"schema": "hr"}
+    
+    payroll_id = Column(Integer, primary_key=True, index=True)
+    employee_id = Column(Integer, ForeignKey("hr.employees.employee_id"), nullable=False)
+    pay_period_start = Column(Date, nullable=False)
+    pay_period_end = Column(Date, nullable=False)
+    pay_date = Column(Date, nullable=False)
+    gross_pay = Column(Numeric(10, 2), nullable=False)
+    deductions = Column(Numeric(10, 2), default=0.00)
+    net_pay = Column(Numeric(10, 2), nullable=False)
+    bonus = Column(Numeric(10, 2), default=0.00)
+    overtime_hours = Column(Numeric(5, 2), default=0.00)
+    overtime_pay = Column(Numeric(8, 2), default=0.00)
+    
+    # Relationships
+    employee = relationship("Employee", back_populates="payroll_logs")
