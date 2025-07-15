@@ -1,0 +1,247 @@
+# Production Alert Rules for EZBI Analytics Platform
+# DevOps Engineer Implementation - SPARC Production Deployment
+
+groups:
+  - name: system.rules
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for more than 5 minutes"
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 85% for more than 5 minutes"
+
+      - alert: DiskSpaceLow
+        expr: node_filesystem_avail_bytes{fstype!="tmpfs"} / node_filesystem_size_bytes{fstype!="tmpfs"} * 100 < 10
+        for: 5m
+        labels:
+          severity: critical
+          component: system
+        annotations:
+          summary: "Disk space is running low"
+          description: "Disk space is below 10% on {{ $labels.device }}"
+
+  - name: application.rules
+    rules:
+      - alert: BackendDown
+        expr: up{job="backend-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: backend
+        annotations:
+          summary: "Backend API is down"
+          description: "Backend API has been down for more than 1 minute"
+
+      - alert: FrontendDown
+        expr: up{job="frontend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: frontend
+        annotations:
+          summary: "Frontend is down"
+          description: "Frontend has been down for more than 1 minute"
+
+      - alert: MLEngineDown
+        expr: up{job="ml-engine"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: ml-engine
+        annotations:
+          summary: "ML Engine is down"
+          description: "ML Engine has been down for more than 1 minute"
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          component: application
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is above 10% for more than 5 minutes"
+
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          component: application
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is above 2 seconds"
+
+  - name: database.rules
+    rules:
+      - alert: PostgreSQLDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL has been down for more than 1 minute"
+
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: cache
+        annotations:
+          summary: "Redis is down"
+          description: "Redis has been down for more than 1 minute"
+
+      - alert: HighDatabaseConnections
+        expr: pg_stat_activity_count > 80
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "High database connections"
+          description: "PostgreSQL has more than 80 active connections"
+
+      - alert: DatabaseSlowQueries
+        expr: pg_stat_activity_max_tx_duration > 300
+        for: 5m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "Database slow queries detected"
+          description: "Long running queries detected (>5 minutes)"
+
+  - name: infrastructure.rules
+    rules:
+      - alert: ContainerDown
+        expr: up{job="cadvisor"} == 0
+        for: 1m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "Container monitoring is down"
+          description: "cAdvisor has been down for more than 1 minute"
+
+      - alert: HighContainerCPU
+        expr: rate(container_cpu_usage_seconds_total{name!=""}[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High container CPU usage"
+          description: "Container {{ $labels.name }} CPU usage is above 80%"
+
+      - alert: HighContainerMemory
+        expr: container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""} > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High container memory usage"
+          description: "Container {{ $labels.name }} memory usage is above 85%"
+
+  - name: security.rules
+    rules:
+      - alert: HighFailedLogins
+        expr: increase(failed_login_attempts_total[5m]) > 50
+        for: 1m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "High failed login attempts"
+          description: "More than 50 failed login attempts in the last 5 minutes"
+
+      - alert: UnauthorizedAccess
+        expr: increase(http_requests_total{status="401"}[5m]) > 100
+        for: 1m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "High unauthorized access attempts"
+          description: "More than 100 unauthorized access attempts in the last 5 minutes"
+
+      - alert: SuspiciousActivity
+        expr: increase(http_requests_total{status="403"}[5m]) > 20
+        for: 1m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "Suspicious activity detected"
+          description: "More than 20 forbidden requests in the last 5 minutes"
+
+  - name: business.rules
+    rules:
+      - alert: LowUserActivity
+        expr: rate(user_actions_total[1h]) < 10
+        for: 10m
+        labels:
+          severity: warning
+          component: business
+        annotations:
+          summary: "Low user activity detected"
+          description: "User activity is below expected levels"
+
+      - alert: HighPredictionErrors
+        expr: prediction_error_rate > 0.15
+        for: 10m
+        labels:
+          severity: warning
+          component: ml
+        annotations:
+          summary: "High ML prediction error rate"
+          description: "ML model prediction error rate is above 15%"
+
+      - alert: DataProcessingBacklog
+        expr: data_processing_queue_size > 1000
+        for: 5m
+        labels:
+          severity: warning
+          component: data
+        annotations:
+          summary: "Data processing backlog"
+          description: "Data processing queue has more than 1000 items"
+
+  - name: backup.rules
+    rules:
+      - alert: BackupFailed
+        expr: time() - last_backup_timestamp > 86400
+        for: 1m
+        labels:
+          severity: critical
+          component: backup
+        annotations:
+          summary: "Database backup failed"
+          description: "No successful backup in the last 24 hours"
+
+      - alert: BackupSizeAnomaly
+        expr: abs(backup_size_bytes - avg_over_time(backup_size_bytes[7d])) / avg_over_time(backup_size_bytes[7d]) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          component: backup
+        annotations:
+          summary: "Backup size anomaly detected"
+          description: "Backup size differs significantly from the 7-day average"

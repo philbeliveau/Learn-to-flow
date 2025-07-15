@@ -1,0 +1,15 @@
+2025-07-15 13:29:51,495 - INFO - 🎯 Starting advanced revenue reconciliation...
+2025-07-15 13:29:51,495 - INFO - 🔍 Analyzing remaining variance...
+2025-07-15 13:29:51,500 - INFO - Current variance: €-499,491.31
+2025-07-15 13:29:51,501 - INFO - Found 0 invoices with multiple cash entries
+2025-07-15 13:29:51,501 - ERROR - ❌ Variance analysis failed: unsupported format string passed to NoneType.__format__
+2025-07-15 13:29:51,501 - ERROR - ❌ Advanced reconciliation failed: unsupported format string passed to NoneType.__format__
+2025-07-15 13:29:51,504 - ERROR - Traceback (most recent call last):
+  File "/Users/philippebeliveau/Desktop/Notebook/Learn-to-flow/advanced_revenue_reconciliation.py", line 48, in execute_advanced_reconciliation
+    variance_analysis = self.analyze_remaining_variance()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/philippebeliveau/Desktop/Notebook/Learn-to-flow/advanced_revenue_reconciliation.py", line 124, in analyze_remaining_variance
+    logger.info(f"Found {null_reference_cash['count']} cash entries with NULL reference_id: €{null_reference_cash['total_amount']:,.2f}")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+

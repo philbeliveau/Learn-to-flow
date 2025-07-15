@@ -36,9 +36,14 @@ import ManufacturingChartsFixed from './charts/ManufacturingChartsFixed';
 import CashFlowPredictionDashboardFixed from './charts/CashFlowPredictionDashboardFixed';
 import AnalyticsChartsFixed from './charts/AnalyticsChartsFixed';
 import ManufacturingDashboardSimple from './charts/ManufacturingDashboardSimple';
+import RoleGuard, { CanWriteDashboard, CanWriteAnalytics, AdminOnly, ManagerOrHigher } from './auth/RoleGuard';
+import { authService, User, UserRole, Permission } from '../services/authService';
+import { cacheService, CACHE_KEYS } from '../services/cacheService';
+import { syntheticDataService } from '../services/syntheticDataService';
+import MobileResponsiveWrapper from './ui/MobileResponsiveWrapper';
 
 interface DashboardProps {
-  user: any;
+  user: User;
   onLogout: () => void;
   apiStatus: string;
 }
@@ -55,46 +60,30 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
 
   const loadKPIs = async () => {
     try {
-      const token = localStorage.getItem('access_token');
-      const response = await fetch('http://localhost:8004/api/v1/company/kpis', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setKpis(data);
-      }
+      // Use cache service for optimized data loading
+      const cachedKpis = await cacheService.getOrSet(
+        CACHE_KEYS.DASHBOARD_KPI,
+        () => syntheticDataService.getKPIs(),
+        300 // 5 minutes cache
+      );
+      setKpis(cachedKpis);
     } catch (error) {
-      console.error('Erreur KPIs:', error);
+      console.error('Error loading KPIs:', error);
     }
   };
 
   const generatePrediction = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('access_token');
-      const response = await fetch('http://localhost:8004/api/v1/predictions/cashflow', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ 
-          revenue: 150000, 
-          expenses: 112500, 
-          period_days: 30,
-          model: "statistical"
-        })
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setPrediction(data);
-      } else {
-        console.error('Prediction API error:', response.statusText);
-      }
+      // Use optimized prediction service with caching
+      const cachedPrediction = await cacheService.getOrSet(
+        CACHE_KEYS.CASH_FLOW_PREDICTION,
+        () => syntheticDataService.getCashFlowPrediction(30),
+        180 // 3 minutes cache for predictions
+      );
+      setPrediction(cachedPrediction);
     } catch (error) {
-      console.error('Erreur prédiction:', error);
+      console.error('Error generating prediction:', error);
     } finally {
       setLoading(false);
     }
@@ -226,40 +215,68 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
   };
 
   return (
-    <div className="min-h-screen bg-black text-white font-light">
-      {/* Navigation Sidebar */}
-      <NavigationSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+    <MobileResponsiveWrapper>
+      <div className="min-h-screen bg-black text-white font-light">
+        {/* Navigation Sidebar */}
+        <NavigationSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {/* Main Content */}
-      <div className="ml-64">
+        {/* Main Content */}
+        <div className="ml-0 md:ml-64">
         {/* Header */}
         <header className="bg-black border-b border-white/20 sticky top-0 z-30">
           <div className="px-8 py-6">
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-xl font-light text-white">Bonjour, {user?.name || 'Utilisateur'}</h1>
-                <p className="text-sm font-light text-white/70">{user?.company?.name || 'EZBI Analytics'}</p>
+                <h1 className="text-xl font-light text-white">Welcome, {user?.name || 'User'}</h1>
+                <div className="flex items-center gap-3">
+                  <p className="text-sm font-light text-white/70">{user?.company?.name || 'EZBI Analytics'}</p>
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    user?.role === UserRole.ADMIN ? 'bg-red-500/20 text-red-300' :
+                    user?.role === UserRole.MANAGER ? 'bg-blue-500/20 text-blue-300' :
+                    user?.role === UserRole.ANALYST ? 'bg-green-500/20 text-green-300' :
+                    'bg-gray-500/20 text-gray-300'
+                  }`}>
+                    {user?.role?.toUpperCase()}
+                  </span>
+                  {user?.is_mfa_enabled && (
+                    <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-300">
+                      MFA
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex gap-6 items-center">
                 {/* API Status */}
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full ${
-                    apiStatus === 'online' ? 'bg-white' : 
-                    apiStatus === 'offline' ? 'bg-white/30' : 
-                    'bg-white/60 animate-pulse'
+                    apiStatus === 'online' ? 'bg-green-500' : 
+                    apiStatus === 'offline' ? 'bg-red-500' : 
+                    'bg-yellow-500 animate-pulse'
                   }`}></div>
                   <span className="text-sm font-light text-white/80">
-                    {apiStatus === 'online' ? 'Système en ligne' : 
-                     apiStatus === 'offline' ? 'Hors ligne' : 
-                     'Vérification...'}
+                    {apiStatus === 'online' ? 'System Online' : 
+                     apiStatus === 'offline' ? 'System Offline' : 
+                     'Checking...'}
                   </span>
                 </div>
+                
+                {/* Role-based actions */}
+                <AdminOnly>
+                  <button 
+                    onClick={() => cacheService.clear()}
+                    className="border border-white/30 hover:border-white/60 text-white px-3 py-1 text-sm font-light transition-colors"
+                    style={{backgroundColor: 'transparent'}}
+                  >
+                    Clear Cache
+                  </button>
+                </AdminOnly>
+                
                 <button 
                   onClick={onLogout}
                   className="border border-white/30 hover:border-white/60 text-white px-4 py-2 font-light transition-colors"
                   style={{backgroundColor: 'transparent'}}
                 >
-                  Déconnexion
+                  Logout
                 </button>
               </div>
             </div>
@@ -267,10 +284,11 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
         </header>
 
         {/* Content Area */}
-        <div className="p-8">
+        <div className="p-4 md:p-8">
           {renderActiveTab()}
         </div>
       </div>
     </div>
+    </MobileResponsiveWrapper>
   );
 }

@@ -1,36 +1,54 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import declarative_base, Session
-from sqlalchemy.pool import StaticPool
-from sqlalchemy import create_engine, event
+from sqlalchemy.pool import QueuePool
+from sqlalchemy import create_engine, event, text
 from contextlib import asynccontextmanager
 import structlog
-from typing import AsyncGenerator, Optional
+from typing import AsyncGenerator, Optional, Dict, Any, List
+from datetime import datetime
+import json
+import os
 
 from app.core.config import settings
 
 # Configure logger
 logger = structlog.get_logger()
 
-# Create async engine
+# Create async engine with enhanced configuration
 async_engine = create_async_engine(
     settings.async_database_url,
     echo=settings.DATABASE_ECHO,
+    echo_pool=bool(os.getenv('DB_ECHO_POOL', 'false').lower() == 'true'),
+    poolclass=QueuePool,
     pool_size=settings.DATABASE_POOL_SIZE,
     max_overflow=settings.DATABASE_MAX_OVERFLOW,
     pool_timeout=settings.DATABASE_POOL_TIMEOUT,
     pool_pre_ping=True,
-    pool_recycle=300,  # 5 minutes
+    pool_recycle=3600,  # 1 hour for production
+    pool_reset_on_return='commit',
+    connect_args={
+        'server_settings': {
+            'application_name': 'EZBI_Analytics_Production',
+            'timezone': 'UTC',
+            'statement_timeout': '30000',  # 30 seconds
+            'idle_in_transaction_session_timeout': '60000',  # 60 seconds
+            'log_statement': 'all',
+            'log_min_duration_statement': '1000',  # Log queries > 1 second
+        }
+    }
 )
 
 # Create sync engine for migrations
 sync_engine = create_engine(
     settings.sync_database_url,
     echo=settings.DATABASE_ECHO,
+    poolclass=QueuePool,
     pool_size=settings.DATABASE_POOL_SIZE,
     max_overflow=settings.DATABASE_MAX_OVERFLOW,
     pool_timeout=settings.DATABASE_POOL_TIMEOUT,
     pool_pre_ping=True,
-    pool_recycle=300,
+    pool_recycle=3600,
+    pool_reset_on_return='commit',
 )
 
 # Create async session maker
@@ -240,25 +258,26 @@ class DatabaseMetrics:
     async def get_query_stats() -> dict:
         """Get query statistics (PostgreSQL specific)."""
         async with get_db_session() as session:
-            sql = """
+            sql = text("""
             SELECT 
                 query,
                 calls,
-                total_time,
-                mean_time,
+                total_exec_time as total_time,
+                mean_exec_time as mean_time,
                 rows
             FROM pg_stat_statements 
-            ORDER BY total_time DESC 
+            WHERE query NOT LIKE '%pg_stat_statements%'
+            ORDER BY total_exec_time DESC 
             LIMIT 10
-            """
+            """)
             result = await session.execute(sql)
-            return result.fetchall()
+            return [dict(row) for row in result.fetchall()]
     
     @staticmethod
     async def get_table_stats() -> dict:
         """Get table statistics."""
         async with get_db_session() as session:
-            sql = """
+            sql = text("""
             SELECT 
                 schemaname,
                 tablename,
@@ -268,7 +287,54 @@ class DatabaseMetrics:
                 n_live_tup as live_tuples,
                 n_dead_tup as dead_tuples
             FROM pg_stat_user_tables
+            WHERE schemaname = 'public'
             ORDER BY n_live_tup DESC
-            """
+            """)
             result = await session.execute(sql)
-            return result.fetchall()
+            return [dict(row) for row in result.fetchall()]
+    
+    @staticmethod
+    async def get_manufacturing_stats() -> dict:
+        """Get manufacturing-specific statistics."""
+        async with get_db_session() as session:
+            stats = {}
+            
+            # Manufacturing table row counts
+            tables = ['sales_customers', 'sales_invoices', 'accounting_accounts_receivable',
+                     'finance_cash_ledger', 'operations_production_orders', 'hr_employees']
+            
+            for table in tables:
+                sql = text(f"SELECT COUNT(*) as count FROM {table}")
+                result = await session.execute(sql)
+                stats[f"{table}_count"] = result.scalar()
+            
+            # Cash flow summary
+            sql = text("""
+                SELECT 
+                    SUM(CASE WHEN transaction_type = 'inflow' THEN amount ELSE 0 END) as total_inflow,
+                    SUM(CASE WHEN transaction_type = 'outflow' THEN amount ELSE 0 END) as total_outflow,
+                    MAX(running_balance) as max_balance,
+                    MIN(running_balance) as min_balance
+                FROM finance_cash_ledger
+                WHERE date_recorded >= CURRENT_DATE - INTERVAL '30 days'
+            """)
+            result = await session.execute(sql)
+            cash_flow = result.fetchone()
+            if cash_flow:
+                stats.update(dict(cash_flow))
+            
+            # Production efficiency
+            sql = text("""
+                SELECT 
+                    AVG(units_produced::float / NULLIF(units_ordered, 0)) as avg_efficiency,
+                    COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_orders,
+                    COUNT(*) as total_orders
+                FROM operations_production_orders
+                WHERE start_date >= CURRENT_DATE - INTERVAL '30 days'
+            """)
+            result = await session.execute(sql)
+            production = result.fetchone()
+            if production:
+                stats.update(dict(production))
+            
+            return stats

@@ -1,0 +1,130 @@
+2025-07-15 13:28:01,232 - INFO - 🚀 Starting comprehensive data engineering revenue fix...
+2025-07-15 13:28:01,232 - INFO - 📦 Creating comprehensive data backup...
+2025-07-15 13:28:01,242 - INFO - ✅ Comprehensive backup created successfully
+2025-07-15 13:28:01,242 - INFO - 🔧 Fixing orphaned cash entries...
+2025-07-15 13:28:01,244 - INFO - Found 107 orphaned cash entries
+2025-07-15 13:28:01,245 - INFO - Created invoice AUTO-20250715-dd0bdd63 for cash entry TXN-2025-00001
+2025-07-15 13:28:01,245 - INFO - Created invoice AUTO-20250715-acc965b4 for cash entry TXN-2025-00017
+2025-07-15 13:28:01,245 - INFO - Created invoice AUTO-20250715-d973452a for cash entry TXN-2025-00025
+2025-07-15 13:28:01,246 - INFO - Created invoice AUTO-20250715-1bf28c9c for cash entry TXN-2024-00033
+2025-07-15 13:28:01,246 - INFO - Created invoice AUTO-20250715-db71b812 for cash entry TXN-2024-00039
+2025-07-15 13:28:01,246 - INFO - Created invoice AUTO-20250715-401df700 for cash entry TXN-2025-00050
+2025-07-15 13:28:01,246 - INFO - Created invoice AUTO-20250715-70adc9ae for cash entry TXN-2024-00051
+2025-07-15 13:28:01,246 - INFO - Created invoice AUTO-20250715-67573992 for cash entry TXN-2025-00053
+2025-07-15 13:28:01,246 - INFO - Created invoice AUTO-20250715-92fbc6df for cash entry TXN-2025-00096
+2025-07-15 13:28:01,246 - INFO - Created invoice AUTO-20250715-fcc97d43 for cash entry TXN-2024-00102
+2025-07-15 13:28:01,246 - INFO - Created invoice AUTO-20250715-e340ccbd for cash entry TXN-2024-00109
+2025-07-15 13:28:01,247 - INFO - Created invoice AUTO-20250715-b6798931 for cash entry TXN-2025-00113
+2025-07-15 13:28:01,247 - INFO - Created invoice AUTO-20250715-8b89eb27 for cash entry TXN-2024-00123
+2025-07-15 13:28:01,247 - INFO - Created invoice AUTO-20250715-d845f9ae for cash entry TXN-2025-00125
+2025-07-15 13:28:01,247 - INFO - Created invoice AUTO-20250715-2d04c7cf for cash entry TXN-2025-00136
+2025-07-15 13:28:01,247 - INFO - Created invoice AUTO-20250715-77a70c59 for cash entry TXN-2024-00141
+2025-07-15 13:28:01,248 - INFO - Created invoice AUTO-20250715-e25ce3b9 for cash entry TXN-2025-00153
+2025-07-15 13:28:01,248 - INFO - Created invoice AUTO-20250715-3e2f34db for cash entry TXN-2025-00157
+2025-07-15 13:28:01,248 - INFO - Created invoice AUTO-20250715-4d9bdada for cash entry TXN-2025-00158
+2025-07-15 13:28:01,248 - INFO - Created invoice AUTO-20250715-bc187b48 for cash entry TXN-2025-00160
+2025-07-15 13:28:01,248 - INFO - Created invoice AUTO-20250715-137b3153 for cash entry TXN-2024-00169
+2025-07-15 13:28:01,248 - INFO - Created invoice AUTO-20250715-08e3760d for cash entry TXN-2025-00174
+2025-07-15 13:28:01,249 - INFO - Created invoice AUTO-20250715-38e4680b for cash entry TXN-2025-00178
+2025-07-15 13:28:01,249 - INFO - Created invoice AUTO-20250715-687ba6e7 for cash entry TXN-2024-00182
+2025-07-15 13:28:01,249 - INFO - Created invoice AUTO-20250715-a2689798 for cash entry TXN-2024-00186
+2025-07-15 13:28:01,249 - INFO - Created invoice AUTO-20250715-90ed7744 for cash entry TXN-2024-00211
+2025-07-15 13:28:01,249 - INFO - Created invoice AUTO-20250715-46687aea for cash entry TXN-2025-00225
+2025-07-15 13:28:01,249 - INFO - Created invoice AUTO-20250715-5008033c for cash entry TXN-2025-00228
+2025-07-15 13:28:01,249 - INFO - Created invoice AUTO-20250715-209dee75 for cash entry TXN-2024-00231
+2025-07-15 13:28:01,250 - INFO - Created invoice AUTO-20250715-fa6ad66a for cash entry TXN-2025-00248
+2025-07-15 13:28:01,250 - INFO - Created invoice AUTO-20250715-f5b6a828 for cash entry TXN-2025-00251
+2025-07-15 13:28:01,250 - INFO - Created invoice AUTO-20250715-8deafacb for cash entry TXN-2024-00259
+2025-07-15 13:28:01,250 - INFO - Created invoice AUTO-20250715-185a5e4f for cash entry TXN-2024-00261
+2025-07-15 13:28:01,250 - INFO - Created invoice AUTO-20250715-39c832b9 for cash entry TXN-2025-00263
+2025-07-15 13:28:01,250 - INFO - Created invoice AUTO-20250715-ee5d3548 for cash entry TXN-2025-00273
+2025-07-15 13:28:01,250 - INFO - Created invoice AUTO-20250715-c1d10000 for cash entry TXN-2024-00274
+2025-07-15 13:28:01,250 - INFO - Created invoice AUTO-20250715-9e2eb6aa for cash entry TXN-2025-00277
+2025-07-15 13:28:01,250 - INFO - Created invoice AUTO-20250715-587255b4 for cash entry TXN-2024-00281
+2025-07-15 13:28:01,250 - INFO - Created invoice AUTO-20250715-b8e6d14b for cash entry TXN-2025-00287
+2025-07-15 13:28:01,251 - INFO - Created invoice AUTO-20250715-6d6042c7 for cash entry TXN-2025-00307
+2025-07-15 13:28:01,251 - INFO - Created invoice AUTO-20250715-9085e9a1 for cash entry TXN-2024-00320
+2025-07-15 13:28:01,251 - INFO - Created invoice AUTO-20250715-aa81a0d1 for cash entry TXN-2025-00333
+2025-07-15 13:28:01,251 - INFO - Created invoice AUTO-20250715-6b6459dd for cash entry TXN-2025-00336
+2025-07-15 13:28:01,251 - INFO - Created invoice AUTO-20250715-941884d7 for cash entry TXN-2024-00339
+2025-07-15 13:28:01,251 - INFO - Created invoice AUTO-20250715-be765109 for cash entry TXN-2025-00343
+2025-07-15 13:28:01,251 - INFO - Created invoice AUTO-20250715-786274c7 for cash entry TXN-2024-00372
+2025-07-15 13:28:01,251 - INFO - Created invoice AUTO-20250715-a67d87e3 for cash entry TXN-2025-00391
+2025-07-15 13:28:01,251 - INFO - Created invoice AUTO-20250715-7b9485b2 for cash entry TXN-2025-00395
+2025-07-15 13:28:01,251 - INFO - Created invoice AUTO-20250715-b98ff55d for cash entry TXN-2025-00399
+2025-07-15 13:28:01,252 - INFO - Created invoice AUTO-20250715-62aa0492 for cash entry TXN-2025-00410
+2025-07-15 13:28:01,252 - INFO - Created invoice AUTO-20250715-e9b182ea for cash entry TXN-2024-00412
+2025-07-15 13:28:01,252 - INFO - Created invoice AUTO-20250715-1a58b179 for cash entry TXN-2024-00413
+2025-07-15 13:28:01,252 - INFO - Created invoice AUTO-20250715-f94a922f for cash entry TXN-2025-00433
+2025-07-15 13:28:01,252 - INFO - Created invoice AUTO-20250715-fbaa01e8 for cash entry TXN-2024-00444
+2025-07-15 13:28:01,252 - INFO - Created invoice AUTO-20250715-3c8e96e0 for cash entry TXN-2024-00463
+2025-07-15 13:28:01,252 - INFO - Created invoice AUTO-20250715-ad6645b1 for cash entry TXN-2025-00469
+2025-07-15 13:28:01,252 - INFO - Created invoice AUTO-20250715-c68c0c2f for cash entry TXN-2024-00497
+2025-07-15 13:28:01,252 - INFO - Created invoice AUTO-20250715-d2a7ed5f for cash entry TXN-2025-00519
+2025-07-15 13:28:01,252 - INFO - Created invoice AUTO-20250715-76657f71 for cash entry TXN-2024-00524
+2025-07-15 13:28:01,253 - INFO - Created invoice AUTO-20250715-0a88b6f5 for cash entry TXN-2024-00531
+2025-07-15 13:28:01,253 - INFO - Created invoice AUTO-20250715-14692de6 for cash entry TXN-2024-00543
+2025-07-15 13:28:01,253 - INFO - Created invoice AUTO-20250715-c5a4c6aa for cash entry TXN-2024-00561
+2025-07-15 13:28:01,253 - INFO - Created invoice AUTO-20250715-b4616534 for cash entry TXN-2025-00564
+2025-07-15 13:28:01,253 - INFO - Created invoice AUTO-20250715-2b4a4647 for cash entry TXN-2025-00570
+2025-07-15 13:28:01,253 - INFO - Created invoice AUTO-20250715-ecadddb5 for cash entry TXN-2024-00572
+2025-07-15 13:28:01,253 - INFO - Created invoice AUTO-20250715-61a07902 for cash entry TXN-2024-00591
+2025-07-15 13:28:01,253 - INFO - Created invoice AUTO-20250715-a7591716 for cash entry TXN-2025-00596
+2025-07-15 13:28:01,253 - INFO - Created invoice AUTO-20250715-464b9ff2 for cash entry TXN-2025-00602
+2025-07-15 13:28:01,253 - INFO - Created invoice AUTO-20250715-e62d4406 for cash entry TXN-2024-00608
+2025-07-15 13:28:01,253 - INFO - Created invoice AUTO-20250715-98ca6fe1 for cash entry TXN-2024-00612
+2025-07-15 13:28:01,254 - INFO - Created invoice AUTO-20250715-3f39e2f7 for cash entry TXN-2024-00617
+2025-07-15 13:28:01,254 - INFO - Created invoice AUTO-20250715-7068c67e for cash entry TXN-2024-00643
+2025-07-15 13:28:01,254 - INFO - Created invoice AUTO-20250715-1325327b for cash entry TXN-2025-00644
+2025-07-15 13:28:01,254 - INFO - Created invoice AUTO-20250715-6cdde646 for cash entry TXN-2024-00648
+2025-07-15 13:28:01,254 - INFO - Created invoice AUTO-20250715-c1a7d8bf for cash entry TXN-2025-00663
+2025-07-15 13:28:01,254 - INFO - Created invoice AUTO-20250715-0fdb42e3 for cash entry TXN-2025-00670
+2025-07-15 13:28:01,254 - INFO - Created invoice AUTO-20250715-50ba7f20 for cash entry TXN-2025-00699
+2025-07-15 13:28:01,254 - INFO - Created invoice AUTO-20250715-890bb5af for cash entry TXN-2024-00717
+2025-07-15 13:28:01,254 - INFO - Created invoice AUTO-20250715-4f7252da for cash entry TXN-2024-00727
+2025-07-15 13:28:01,255 - INFO - Created invoice AUTO-20250715-2562e0dc for cash entry TXN-2025-00730
+2025-07-15 13:28:01,255 - INFO - Created invoice AUTO-20250715-5af23395 for cash entry TXN-2025-00735
+2025-07-15 13:28:01,255 - INFO - Created invoice AUTO-20250715-d8e4e996 for cash entry TXN-2024-00742
+2025-07-15 13:28:01,255 - INFO - Created invoice AUTO-20250715-9b49bb26 for cash entry TXN-2024-00744
+2025-07-15 13:28:01,255 - INFO - Created invoice AUTO-20250715-baed37e5 for cash entry TXN-2025-00752
+2025-07-15 13:28:01,255 - INFO - Created invoice AUTO-20250715-1288af04 for cash entry TXN-2024-00753
+2025-07-15 13:28:01,255 - INFO - Created invoice AUTO-20250715-d7a181b0 for cash entry TXN-2025-00757
+2025-07-15 13:28:01,255 - INFO - Created invoice AUTO-20250715-7c75898f for cash entry TXN-2024-00759
+2025-07-15 13:28:01,255 - INFO - Created invoice AUTO-20250715-bff2580e for cash entry TXN-2024-00769
+2025-07-15 13:28:01,255 - INFO - Created invoice AUTO-20250715-2e610c06 for cash entry TXN-2025-00790
+2025-07-15 13:28:01,255 - INFO - Created invoice AUTO-20250715-d79201e0 for cash entry TXN-2024-00792
+2025-07-15 13:28:01,256 - INFO - Created invoice AUTO-20250715-14a82f4f for cash entry TXN-2025-00797
+2025-07-15 13:28:01,256 - INFO - Created invoice AUTO-20250715-50b9fe95 for cash entry TXN-2025-00804
+2025-07-15 13:28:01,256 - INFO - Created invoice AUTO-20250715-f1eed319 for cash entry TXN-2024-00824
+2025-07-15 13:28:01,256 - INFO - Created invoice AUTO-20250715-b07bd504 for cash entry TXN-2024-00833
+2025-07-15 13:28:01,256 - INFO - Created invoice AUTO-20250715-d8539542 for cash entry TXN-2025-00868
+2025-07-15 13:28:01,256 - INFO - Created invoice AUTO-20250715-eb650a00 for cash entry TXN-2025-00875
+2025-07-15 13:28:01,256 - INFO - Created invoice AUTO-20250715-58544215 for cash entry TXN-2024-00891
+2025-07-15 13:28:01,256 - INFO - Created invoice AUTO-20250715-af49f379 for cash entry TXN-2025-00894
+2025-07-15 13:28:01,256 - INFO - Created invoice AUTO-20250715-ff4d60f5 for cash entry TXN-2025-00914
+2025-07-15 13:28:01,256 - INFO - Created invoice AUTO-20250715-7c0705a8 for cash entry TXN-2025-00929
+2025-07-15 13:28:01,257 - INFO - Created invoice AUTO-20250715-a8e34568 for cash entry TXN-2025-00930
+2025-07-15 13:28:01,257 - INFO - Created invoice AUTO-20250715-e0025420 for cash entry TXN-2025-00941
+2025-07-15 13:28:01,257 - INFO - Created invoice AUTO-20250715-d1b6b396 for cash entry TXN-2024-00948
+2025-07-15 13:28:01,257 - INFO - Created invoice AUTO-20250715-38af379c for cash entry TXN-2024-00949
+2025-07-15 13:28:01,257 - INFO - Created invoice AUTO-20250715-4fc6b9a1 for cash entry TXN-2025-00951
+2025-07-15 13:28:01,257 - INFO - Created invoice AUTO-20250715-02d90419 for cash entry TXN-2025-00966
+2025-07-15 13:28:01,257 - INFO - Created invoice AUTO-20250715-bed9c099 for cash entry TXN-2025-00975
+2025-07-15 13:28:01,262 - INFO - ✅ Orphaned cash fix: 0 matched, 107 created, 107 remaining
+2025-07-15 13:28:01,262 - INFO - 🔍 Implementing real-time validation system...
+2025-07-15 13:28:01,264 - INFO - ✅ Real-time validation system implemented
+2025-07-15 13:28:01,264 - INFO - 🔄 Creating automated consistency checks...
+2025-07-15 13:28:01,267 - INFO - ✅ Automated consistency checks created
+2025-07-15 13:28:01,267 - INFO - 🏭 Building ETL pipeline for manufacturing data...
+2025-07-15 13:28:01,268 - INFO - ✅ ETL pipeline for manufacturing data built
+2025-07-15 13:28:01,268 - INFO - 📊 Implementing data quality monitoring...
+2025-07-15 13:28:01,269 - INFO - ✅ Data quality monitoring implemented
+2025-07-15 13:28:01,270 - INFO - 🔄 Creating automated reconciliation processes...
+2025-07-15 13:28:01,271 - INFO - ✅ Automated reconciliation processes created
+2025-07-15 13:28:01,271 - INFO - 🔍 Performing final validation...
+2025-07-15 13:28:01,272 - INFO - ✅ Final validation completed
+2025-07-15 13:28:01,272 - INFO - Revenue variance: €499491.31
+2025-07-15 13:28:01,272 - INFO - AR variance: €0.00
+2025-07-15 13:28:01,272 - INFO - Data integrity: 88.6%
+2025-07-15 13:28:01,272 - INFO - All checks passed: False
+2025-07-15 13:28:01,272 - INFO - ✅ Comprehensive data engineering fix completed successfully

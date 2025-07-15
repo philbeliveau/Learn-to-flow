@@ -1,0 +1,74 @@
+{
+  "timestamp": "2025-07-15T13:31:34.664933",
+  "executive_summary": {
+    "revenue_variance": -499491.31000000006,
+    "revenue_target_met": false,
+    "ar_variance": 0.0,
+    "ar_target_met": true,
+    "data_integrity": 88.58024691358025,
+    "integrity_target_met": false,
+    "overall_success": false
+  },
+  "detailed_metrics": {
+    "paid_invoices_total": 3559406.51,
+    "cash_sales_total": 4058897.82,
+    "ar_outstanding": 4093506.98,
+    "unpaid_invoices_total": 4093506.98,
+    "data_integrity_percentage": 88.58024691358025
+  },
+  "validation_results": [
+    {
+      "validation_type": "Revenue Reconciliation",
+      "target_value": 100.0,
+      "actual_value": 499491.31000000006,
+      "variance": -499491.31000000006,
+      "status": "FAIL",
+      "meets_target": 0
+    },
+    {
+      "validation_type": "AR Reconciliation",
+      "target_value": 100.0,
+      "actual_value": 0.0,
+      "variance": 0.0,
+      "status": "PASS",
+      "meets_target": 1
+    },
+    {
+      "validation_type": "Data Integrity",
+      "target_value": 95.0,
+      "actual_value": 88.58024691358025,
+      "variance": -6.419753086419746,
+      "status": "FAIL",
+      "meets_target": 0
+    }
+  ],
+  "monitoring_metrics": [
+    {
+      "metric_name": "Revenue Variance",
+      "metric_value": 499491.31000000006,
+      "metric_unit": "EUR",
+      "status": "WARNING"
+    },
+    {
+      "metric_name": "AR Variance",
+      "metric_value": 0.0,
+      "metric_unit": "EUR",
+      "status": "GOOD"
+    },
+    {
+      "metric_name": "Data Integrity",
+      "metric_value": 88.58024691358025,
+      "metric_unit": "Percentage",
+      "status": "WARNING"
+    }
+  ],
+  "deliverables_status": {
+    "revenue_recognition_fix": false,
+    "data_validation_service": true,
+    "etl_pipeline_implementation": true,
+    "data_quality_monitoring": true,
+    "automated_reconciliation": true,
+    "data_consistency_checks": true,
+    "comprehensive_reporting": true
+  }
+}

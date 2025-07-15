@@ -7,12 +7,15 @@ from app.api.v1.endpoints import (
     financial_data,
     predictions,
     data,
+    data_cached,
     file_uploads,
     analytics,
     integrations,
     notifications,
     admin,
     health,
+    manufacturing,
+    performance,
 )
 
 api_router = APIRouter()
@@ -29,6 +32,7 @@ api_router.include_router(companies.router, prefix="/companies", tags=["Companie
 api_router.include_router(financial_data.router, prefix="/financial-data", tags=["Financial Data"])
 api_router.include_router(predictions.router, prefix="/predictions", tags=["ML Predictions"])
 api_router.include_router(data.router, prefix="/data", tags=["Data Management"])
+api_router.include_router(data_cached.router, prefix="/data", tags=["Cached Data Management"])
 api_router.include_router(file_uploads.router, prefix="/files", tags=["File Uploads"])
 api_router.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
 
@@ -38,3 +42,9 @@ api_router.include_router(notifications.router, prefix="/notifications", tags=["
 
 # Admin endpoints
 api_router.include_router(admin.router, prefix="/admin", tags=["Admin"])
+
+# Manufacturing endpoints (secure)
+api_router.include_router(manufacturing.router, prefix="/manufacturing", tags=["Manufacturing"])
+
+# Performance monitoring endpoints
+api_router.include_router(performance.router, prefix="/performance", tags=["Performance"])

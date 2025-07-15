@@ -1,0 +1,354 @@
+# Production Docker Compose for EZBI Analytics Platform
+# DevOps Engineer Implementation - SPARC Production Deployment
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database - High Availability
+  postgres:
+    image: postgres:15-alpine
+    container_name: ezbi-postgres-prod
+    environment:
+      POSTGRES_DB: ezbi_analytics
+      POSTGRES_USER: ezbi_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--locale=fr_FR.UTF-8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - ./deployment/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+    ports:
+      - "5432:5432"
+    networks:
+      - ezbi-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ezbi_user -d ezbi_analytics"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+
+  # Redis Cache - Clustered for High Availability
+  redis:
+    image: redis:7-alpine
+    container_name: ezbi-redis-prod
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD} --maxmemory 1gb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+      - ./deployment/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    networks:
+      - ezbi-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+
+  # Backend API - Production Ready
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: ezbi-backend-prod
+    environment:
+      DATABASE_URL: postgresql://ezbi_user:${POSTGRES_PASSWORD}@postgres:5432/ezbi_analytics
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      ENVIRONMENT: production
+      LOG_LEVEL: info
+      CORS_ORIGINS: "https://app.ezbi.fr,https://api.ezbi.fr"
+      WORKER_PROCESSES: 4
+      PROMETHEUS_METRICS: true
+      SENTRY_DSN: ${SENTRY_DSN}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ezbi-network
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+      - ./backend/ssl:/app/ssl
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+
+  # ML Engine - Production Optimized
+  ml-engine:
+    build:
+      context: ./ml-engine
+      dockerfile: Dockerfile
+      target: production
+    container_name: ezbi-ml-engine-prod
+    environment:
+      ML_MODEL_PATH: /app/models
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      PROMETHEUS_PORT: 9090
+      CUDA_VISIBLE_DEVICES: all
+      TENSORFLOW_INTER_OP_PARALLELISM_THREADS: 4
+      TENSORFLOW_INTRA_OP_PARALLELISM_THREADS: 4
+      MODEL_CACHE_SIZE: 1000
+      BATCH_SIZE: 32
+      SENTRY_DSN: ${SENTRY_DSN}
+    ports:
+      - "8004:8000"
+      - "9090:9090"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - ezbi-network
+    volumes:
+      - ./ml-models:/app/models
+      - ./data:/app/data
+      - ml_cache:/app/cache
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2.0'
+        reservations:
+          memory: 2G
+          cpus: '1.0'
+
+  # Frontend - Production Build
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+      args:
+        NEXT_PUBLIC_API_URL: https://api.ezbi.fr
+        NEXT_PUBLIC_ML_API_URL: https://ml.ezbi.fr
+    container_name: ezbi-frontend-prod
+    environment:
+      NEXT_PUBLIC_API_URL: https://api.ezbi.fr
+      NEXT_PUBLIC_ML_API_URL: https://ml.ezbi.fr
+      NODE_ENV: production
+      NEXTAUTH_URL: https://app.ezbi.fr
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+      - ml-engine
+    networks:
+      - ezbi-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+
+  # Nginx Load Balancer - Production Config
+  nginx:
+    image: nginx:alpine
+    container_name: ezbi-nginx-prod
+    volumes:
+      - ./deployment/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./deployment/nginx/ssl:/etc/nginx/ssl
+      - ./logs/nginx:/var/log/nginx
+      - ./frontend/public:/usr/share/nginx/html/static
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - frontend
+      - backend
+      - ml-engine
+    networks:
+      - ezbi-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.25'
+        reservations:
+          memory: 256M
+          cpus: '0.1'
+
+  # Prometheus Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ezbi-prometheus-prod
+    volumes:
+      - ./deployment/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./deployment/monitoring/alert.rules.yml:/etc/prometheus/rules/alert.rules.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - ezbi-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+      - '--storage.tsdb.wal-compression'
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+
+  # Grafana Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ezbi-grafana-prod
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_SECURITY_ALLOW_EMBEDDING: true
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel
+      GF_SMTP_ENABLED: true
+      GF_SMTP_HOST: ${SMTP_HOST}
+      GF_SMTP_USER: ${SMTP_USER}
+      GF_SMTP_PASSWORD: ${SMTP_PASSWORD}
+      GF_SMTP_FROM_ADDRESS: alerts@ezbi.fr
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./deployment/monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./deployment/monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - ezbi-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.25'
+        reservations:
+          memory: 256M
+          cpus: '0.1'
+
+  # Alertmanager for Notifications
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: ezbi-alertmanager-prod
+    volumes:
+      - ./deployment/monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager_data:/alertmanager
+    ports:
+      - "9093:9093"
+    networks:
+      - ezbi-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.1'
+        reservations:
+          memory: 128M
+          cpus: '0.05'
+
+  # Backup Service
+  backup:
+    image: postgres:15-alpine
+    container_name: ezbi-backup-prod
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./deployment/scripts/backup.sh:/backup.sh
+      - backup_data:/backup
+    depends_on:
+      - postgres
+    networks:
+      - ezbi-network
+    command: >
+      sh -c "chmod +x /backup.sh && 
+             while true; do 
+               /backup.sh; 
+               sleep 21600; 
+             done"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  alertmanager_data:
+    driver: local
+  backup_data:
+    driver: local
+  ml_cache:
+    driver: local
+
+networks:
+  ezbi-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+          gateway: 172.25.0.1
