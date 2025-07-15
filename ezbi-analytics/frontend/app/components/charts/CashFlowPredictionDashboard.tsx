@@ -321,7 +321,12 @@ const CashFlowPredictionDashboard: React.FC<CashFlowPredictionDashboardProps> = 
       };
     }
     
-    return modelPerformance.model_info;
+    return {
+      model_type: modelPerformance.model_info.model_type || 'Non disponible',
+      last_training_date: modelPerformance.model_info.last_training_date || null,
+      confidence_interval: modelPerformance.model_info.confidence_interval || 0,
+      available_models: modelPerformance.model_info.available_models || []
+    };
   };
 
   const getRealDataSourcesInfo = () => {
@@ -469,7 +474,7 @@ const CashFlowPredictionDashboard: React.FC<CashFlowPredictionDashboardProps> = 
                   Données PostgreSQL opérationnelles + Excel business planning
                 </p>
                 <div className="space-y-1 text-xs font-light text-white/60">
-                  <div>• Modèles: {getRealModelInfo().available_models.join(', ')}</div>
+                  <div>• Modèles: {getRealModelInfo().available_models?.join(', ') || 'Non disponible'}</div>
                   <div>• Confiance: {getRealModelInfo().confidence_interval}%</div>
                   <div>• Dernière formation: {getRealModelInfo().last_training_date || 'En cours'}</div>
                 </div>
@@ -672,7 +677,7 @@ const CashFlowPredictionDashboard: React.FC<CashFlowPredictionDashboardProps> = 
                   </div>
                   <div className="flex justify-between">
                     <span>Modèles:</span>
-                    <span className="text-white">{getRealModelInfo().available_models.length}</span>
+                    <span className="text-white">{getRealModelInfo().available_models?.length || 0}</span>
                   </div>
                 </div>
               </div>
