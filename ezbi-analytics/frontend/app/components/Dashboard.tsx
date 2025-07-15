@@ -30,11 +30,11 @@ ChartJS.register(
 );
 
 import NavigationSidebar from './NavigationSidebar';
-import OverviewChartsFixed from './charts/OverviewChartsFixed';
-import FinancialChartsFixed from './charts/FinancialChartsFixed';
-import ManufacturingChartsFixed from './charts/ManufacturingChartsFixed';
-import CashFlowPredictionDashboardFixed from './charts/CashFlowPredictionDashboardFixed';
-import AnalyticsChartsFixed from './charts/AnalyticsChartsFixed';
+import OverviewCharts from './charts/OverviewCharts';
+import FinancialCharts from './charts/FinancialCharts';
+import ManufacturingCharts from './charts/ManufacturingCharts';
+import PredictionsCharts from './charts/PredictionsCharts';
+import AnalyticsCharts from './charts/AnalyticsCharts';
 import ManufacturingDashboardSimple from './charts/ManufacturingDashboardSimple';
 import RoleGuard, { CanWriteDashboard, CanWriteAnalytics, AdminOnly, ManagerOrHigher } from './auth/RoleGuard';
 import { authService, User, UserRole, Permission } from '../services/authService';
@@ -195,22 +195,19 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'overview':
-        return <OverviewChartsFixed kpis={kpis} />;
+        return <OverviewCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       case 'financial':
-        return <FinancialChartsFixed chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
+        return <FinancialCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       case 'manufacturing':
-        return <ManufacturingChartsFixed chartOptions={chartOptions} />;
+        return <ManufacturingCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       case 'manufacturing-bi':
         return <ManufacturingDashboardSimple />;
       case 'predictions':
-        return <CashFlowPredictionDashboardFixed 
-          chartOptions={chartOptions} 
-          pieChartOptions={pieChartOptions}
-        />;
+        return <PredictionsCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       case 'analytics':
-        return <AnalyticsChartsFixed chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
+        return <AnalyticsCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       default:
-        return <OverviewChartsFixed kpis={kpis} />;
+        return <OverviewCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
     }
   };
 

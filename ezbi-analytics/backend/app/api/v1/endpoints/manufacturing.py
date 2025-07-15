@@ -675,6 +675,101 @@ async def create_product(
         total_units_produced=0
     )
 
+@router.get("/operations/kpis", response_model=Dict[str, Any])
+async def get_operations_kpis(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_session)
+):
+    """Get operations KPIs and analytics - requires operations_read permission"""
+    
+    # Check permission
+    if not await check_manufacturing_access(current_user, "operations", "read"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions for operations data"
+        )
+    
+    # Rate limiting
+    await check_rate_limit(current_user, request)
+    
+    # Log access
+    await log_api_access(request, current_user, "/operations/kpis", "read", db)
+    
+    # Production efficiency metrics
+    efficiency = await db.execute(
+        text("""
+            SELECT 
+                COUNT(order_id) as total_orders,
+                COALESCE(SUM(units_ordered), 0) as total_units_ordered,
+                COALESCE(SUM(units_produced), 0) as total_units_produced,
+                CASE 
+                    WHEN SUM(units_ordered) > 0 
+                    THEN (SUM(units_produced) * 100.0 / SUM(units_ordered))
+                    ELSE 0
+                END as avg_efficiency
+            FROM operations.production_orders
+        """)
+    )
+    efficiency_data = efficiency.first()
+    
+    # Status breakdown
+    status_breakdown = await db.execute(
+        text("""
+            SELECT 
+                status,
+                COUNT(order_id) as order_count,
+                COALESCE(SUM(units_ordered), 0) as units_ordered,
+                COALESCE(SUM(units_produced), 0) as units_produced
+            FROM operations.production_orders
+            GROUP BY status
+            ORDER BY order_count DESC
+        """)
+    )
+    status_data = [
+        {
+            "status": row.status,
+            "order_count": row.order_count,
+            "units_ordered": row.units_ordered,
+            "units_produced": row.units_produced
+        }
+        for row in status_breakdown.all()
+    ]
+    
+    # Top products by production volume
+    top_products = await db.execute(
+        text("""
+            SELECT 
+                p.product_name,
+                COALESCE(SUM(po.units_produced), 0) as total_produced,
+                COUNT(po.order_id) as order_count
+            FROM operations.products p
+            LEFT JOIN operations.production_orders po ON p.product_id = po.product_id
+            GROUP BY p.product_id, p.product_name
+            ORDER BY total_produced DESC
+            LIMIT 10
+        """)
+    )
+    top_products_data = [
+        {
+            "product_name": row.product_name,
+            "total_produced": row.total_produced,
+            "order_count": row.order_count
+        }
+        for row in top_products.all()
+    ]
+    
+    return {
+        "efficiency": {
+            "total_orders": efficiency_data.total_orders,
+            "total_units_ordered": efficiency_data.total_units_ordered,
+            "total_units_produced": efficiency_data.total_units_produced,
+            "avg_efficiency": float(efficiency_data.avg_efficiency) if efficiency_data.avg_efficiency else 0.0
+        },
+        "status_breakdown": status_data,
+        "top_products": top_products_data
+    }
+
 # ===================
 # FINANCE ENDPOINTS
 # ===================
