@@ -8,6 +8,7 @@ from flask_cors import CORS
 import os
 import sys
 from pathlib import Path
+import logging
 
 # Add the backend directory to Python path
 backend_dir = Path(__file__).parent
@@ -15,13 +16,30 @@ sys.path.insert(0, str(backend_dir))
 
 # Import our manufacturing API
 from api.manufacturing import manufacturing_bp
+from api.scheduler_api import scheduler_bp
+
+# Import scheduler
+from scheduler.scheduler import data_scheduler
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # Create Flask app
 app = Flask(__name__)
 CORS(app)
 
-# Register manufacturing blueprint
+# Register blueprints
 app.register_blueprint(manufacturing_bp)
+app.register_blueprint(scheduler_bp)
+
+# Initialize scheduler
+with app.app_context():
+    data_scheduler.init_scheduler(app)
+    logger.info("Data generation scheduler initialized")
 
 # Root endpoint
 @app.route('/')

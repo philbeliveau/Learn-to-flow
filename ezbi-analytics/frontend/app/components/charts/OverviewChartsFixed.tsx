@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { formatCurrency } from '../../services/syntheticDataService';
 import { authService } from '../../services/authService';
+import useSchedulerStatus from '../../hooks/useSchedulerStatus';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8003';
 
 interface OverviewChartsProps {
   kpis: any;
@@ -58,6 +59,7 @@ const OverviewChartsFixed: React.FC<OverviewChartsProps> = ({ kpis }) => {
   const [kpiData, setKpiData] = useState<KPIData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { status: schedulerStatus, loading: schedulerLoading } = useSchedulerStatus();
 
   useEffect(() => {
     loadManufacturingData();
@@ -295,17 +297,58 @@ const OverviewChartsFixed: React.FC<OverviewChartsProps> = ({ kpis }) => {
 
       {/* Data Source Info */}
       <div className="bg-blue-900/20 border border-blue-500 p-4 rounded-lg">
-        <h4 className="text-blue-400 font-medium mb-2">Source des données</h4>
-        <p className="text-blue-300 text-sm">
-          ✅ Connecté aux 13 tables de fabrication • 
-          {overviewData && (
-            <>
-              {formatNumber(overviewData.overview.total_customers)} clients • 
-              {formatNumber(overviewData.overview.total_orders)} commandes • 
-              {formatNumber(overviewData.overview.active_employees)} employés
-            </>
-          )}
-        </p>
+        <h4 className="text-blue-400 font-medium mb-2">État du Système - Données Synthétiques Réelles</h4>
+        <div className="space-y-2">
+          <p className="text-blue-300 text-sm">
+            ✅ Connecté aux 13 tables de fabrication • 
+            {overviewData && (
+              <>
+                {formatNumber(overviewData.overview.total_customers)} clients • 
+                {formatNumber(overviewData.overview.total_orders)} commandes • 
+                {formatNumber(overviewData.overview.active_employees)} employés
+              </>
+            )}
+          </p>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-blue-300">Planificateur de données:</span>
+            <div className="flex items-center gap-1">
+              <div className={`w-2 h-2 rounded-full ${
+                schedulerLoading ? 'bg-yellow-400' :
+                schedulerStatus?.running ? 'bg-green-400' : 'bg-red-400'
+              }`}></div>
+              <span className={`text-xs ${
+                schedulerLoading ? 'text-yellow-400' :
+                schedulerStatus?.running ? 'text-green-400' : 'text-red-400'
+              }`}>
+                {schedulerLoading ? 'Vérification...' :
+                 schedulerStatus?.running ? `${schedulerStatus.jobs_count} tâches actives` : 'Hors ligne'}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-3 pt-3 border-t border-blue-500/30">
+          <h5 className="text-blue-400 text-sm font-medium mb-2">Sources de Données</h5>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="flex justify-between">
+              <span className="text-blue-300">Manufacturing API:</span>
+              <span className="text-green-400">✅ Port 8003</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-blue-300">Base de données:</span>
+              <span className="text-green-400">✅ SQLite</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-blue-300">Génération auto:</span>
+              <span className={schedulerStatus?.running ? 'text-green-400' : 'text-red-400'}>
+                {schedulerStatus?.running ? '✅ Quotidien' : '❌ Arrêté'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-blue-300">Prédictions IA:</span>
+              <span className="text-purple-400">🤖 ML Active</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@
 import React from 'react';
 import { authService, UserRole, Permission } from '../services/authService';
 import RoleGuard from './auth/RoleGuard';
+import useSchedulerStatus from '../hooks/useSchedulerStatus';
 
 interface NavigationTab {
   id: string;
@@ -21,6 +22,7 @@ interface NavigationSidebarProps {
 
 const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeTab, onTabChange }) => {
   const user = authService.getCurrentUser();
+  const { status: schedulerStatus, loading: schedulerLoading, error: schedulerError } = useSchedulerStatus();
   
   const tabs: NavigationTab[] = [
     {
@@ -190,6 +192,19 @@ const NavigationSidebar: React.FC<NavigationSidebarProps> = ({ activeTab, onTabC
           <div className="flex justify-between">
             <span>AI Predictions:</span>
             <span className="text-purple-400">ML</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Scheduler:</span>
+            <span className={
+              schedulerLoading ? 'text-yellow-400' :
+              schedulerError ? 'text-red-400' :
+              schedulerStatus?.running ? 'text-green-400' : 
+              'text-gray-400'
+            }>
+              {schedulerLoading ? 'Loading...' :
+               schedulerError ? 'Error' :
+               schedulerStatus?.running ? `${schedulerStatus.jobs_count} Jobs` : 'Offline'}
+            </span>
           </div>
           <div className="flex justify-between">
             <span>Security:</span>

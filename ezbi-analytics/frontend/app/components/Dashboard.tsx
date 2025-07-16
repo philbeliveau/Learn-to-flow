@@ -30,7 +30,7 @@ ChartJS.register(
 );
 
 import NavigationSidebar from './NavigationSidebar';
-import OverviewCharts from './charts/OverviewCharts';
+import OverviewChartsFixed from './charts/OverviewChartsFixed';
 import FinancialCharts from './charts/FinancialCharts';
 import ManufacturingCharts from './charts/ManufacturingCharts';
 import PredictionsCharts from './charts/PredictionsCharts';
@@ -195,7 +195,7 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'overview':
-        return <OverviewCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
+        return <OverviewChartsFixed kpis={kpis} />;
       case 'financial':
         return <FinancialCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       case 'manufacturing':
@@ -207,7 +207,7 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
       case 'analytics':
         return <AnalyticsCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       default:
-        return <OverviewCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
+        return <OverviewChartsFixed kpis={kpis} />;
     }
   };
 

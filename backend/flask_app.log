@@ -1,0 +1,47 @@
+2025-07-16 08:46:41,677 - scheduler.scheduler - INFO - Scheduler is disabled via ENABLE_SCHEDULER environment variable
+2025-07-16 08:46:41,677 - __main__ - INFO - Data generation scheduler initialized
+🏭 EZBI Analytics - Manufacturing Intelligence API
+==================================================
+📊 13 Manufacturing Tables Connected
+📈 3,527 Synthetic Records Available
+🔗 All Business Intelligence Endpoints Ready
+==================================================
+📱 Frontend Development Server: http://localhost:3000
+🔧 Backend API Server: http://localhost:8003
+📋 API Documentation: http://localhost:8003/api/docs
+==================================================
+ * Serving Flask app 'app_flask'
+ * Debug mode: on
+2025-07-16 08:46:41,687 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8003
+ * Running on http://192.168.0.198:8003
+2025-07-16 08:46:41,687 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-16 08:46:41,687 - werkzeug - INFO -  * Restarting with stat
+2025-07-16 08:46:41,852 - scheduler.scheduler - INFO - Scheduler is disabled via ENABLE_SCHEDULER environment variable
+2025-07-16 08:46:41,852 - __main__ - INFO - Data generation scheduler initialized
+2025-07-16 08:46:41,855 - werkzeug - WARNING -  * Debugger is active!
+2025-07-16 08:46:41,862 - werkzeug - INFO -  * Debugger PIN: 458-547-647
+2025-07-16 08:46:49,114 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 08:46:49] "GET /health HTTP/1.1" 200 -
+2025-07-16 08:46:49,956 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 08:46:49] "GET / HTTP/1.1" 200 -
+2025-07-16 08:47:11,555 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 08:47:11] "GET /health HTTP/1.1" 200 -
+2025-07-16 08:47:11,589 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 08:47:11] "GET / HTTP/1.1" 200 -
+2025-07-16 08:47:32,268 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 08:47:32] "GET /api/manufacturing/dashboard/overview HTTP/1.1" 200 -
+2025-07-16 08:47:46,360 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 08:47:46] "GET /api/manufacturing/dashboard/overview HTTP/1.1" 200 -
+2025-07-16 08:47:46,400 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 08:47:46] "GET /api/manufacturing/sales/kpis HTTP/1.1" 200 -
+2025-07-16 08:47:46,434 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 08:47:46] "GET /api/manufacturing/operations/kpis HTTP/1.1" 200 -
+2025-07-16 08:47:46,468 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 08:47:46] "GET /api/manufacturing/sales/customers HTTP/1.1" 200 -
+2025-07-16 08:47:46,502 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 08:47:46] "GET /api/manufacturing/operations/products HTTP/1.1" 200 -
+2025-07-16 08:50:57,638 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 08:50:57] "GET /health HTTP/1.1" 200 -
+2025-07-16 08:50:57,650 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 08:50:57] "GET /health HTTP/1.1" 200 -
+2025-07-16 08:50:57,710 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 08:50:57] "GET /api/manufacturing/dashboard/overview HTTP/1.1" 200 -
+🏭 EZBI Analytics - Manufacturing Intelligence API
+==================================================
+📊 13 Manufacturing Tables Connected
+📈 3,527 Synthetic Records Available
+🔗 All Business Intelligence Endpoints Ready
+==================================================
+📱 Frontend Development Server: http://localhost:3000
+🔧 Backend API Server: http://localhost:8003
+📋 API Documentation: http://localhost:8003/api/docs
+==================================================
