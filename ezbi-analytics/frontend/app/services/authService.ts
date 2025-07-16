@@ -170,20 +170,31 @@ export class AuthService {
    */
   public async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
+      console.log('🔐 Attempting login to:', `${API_BASE_URL}/api/v1/auth/login`);
+      console.log('📧 Credentials:', { email: credentials.email, password: '***' });
+      
       const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-cache'
         },
-        body: JSON.stringify(credentials)
+        body: JSON.stringify(credentials),
+        // Add timeout to prevent hanging
+        signal: AbortSignal.timeout(10000)
       });
 
+      console.log('📡 Response status:', response.status, response.statusText);
+      console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+      
       if (!response.ok) {
-        throw new Error('Login failed');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('❌ Login failed:', errorData);
+        throw new Error(errorData.detail || `Login failed: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('✅ Login response:', data);
 
       // Handle simple auth service response format
       if (data.access_token && data.user) {
@@ -219,9 +230,23 @@ export class AuthService {
       };
     } catch (error) {
       console.error('Login error:', error);
+      let errorMessage = 'Login failed';
+      
+      if (error instanceof Error) {
+        if (error.name === 'AbortError' || error.message.includes('timeout')) {
+          errorMessage = 'Connection timeout. Please try again.';
+        } else if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Unable to connect to server. Please check your connection.';
+        } else if (error.message.includes('401')) {
+          errorMessage = 'Invalid email or password.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       return {
         success: false,
-        message: error instanceof Error ? error.message : 'Login failed'
+        message: errorMessage
       };
     }
   }

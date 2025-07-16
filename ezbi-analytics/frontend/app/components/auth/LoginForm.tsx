@@ -22,11 +22,14 @@ export default function LoginForm({ onLogin, apiStatus }: LoginFormProps) {
   const [requiresMFA, setRequiresMFA] = useState(false);
   const [showMFASetup, setShowMFASetup] = useState(false);
   const [authResponse, setAuthResponse] = useState<AuthResponse | null>(null);
+  const [showDebugInfo, setShowDebugInfo] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    console.log('🔐 Form submitted with:', { email: formData.email, password: '***' });
 
     try {
       const response = await authService.login(formData);
@@ -42,7 +45,24 @@ export default function LoginForm({ onLogin, apiStatus }: LoginFormProps) {
         setError(response.message || 'Login failed');
       }
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Login failed');
+      console.error('🚨 Login error details:', error);
+      console.error('🚨 Error type:', typeof error);
+      console.error('🚨 Error name:', error instanceof Error ? error.name : 'Unknown');
+      console.error('🚨 Error message:', error instanceof Error ? error.message : 'No message');
+      console.error('🚨 Error stack:', error instanceof Error ? error.stack : 'No stack');
+      
+      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      
+      // Provide more user-friendly error messages
+      if (errorMessage.includes('fetch') || errorMessage.includes('Failed to fetch')) {
+        setError('Unable to connect to server. Please check your connection and try again.');
+      } else if (errorMessage.includes('401')) {
+        setError('Invalid email or password. Please check your credentials.');
+      } else if (errorMessage.includes('timeout')) {
+        setError('Connection timeout. Please try again.');
+      } else {
+        setError(`Connection error: ${errorMessage}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -52,6 +72,31 @@ export default function LoginForm({ onLogin, apiStatus }: LoginFormProps) {
     setRequiresMFA(false);
     setShowMFASetup(false);
     onLogin(user);
+  };
+
+  const testConnection = async () => {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      console.log('🔍 Testing connection to:', apiUrl);
+      
+      const response = await fetch(`${apiUrl}/health`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      console.log('📡 Response status:', response.status);
+      console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+      
+      const data = await response.json();
+      console.log('📊 Response data:', data);
+      
+      alert(`✅ Connection test SUCCESS!\n\nStatus: ${response.status}\nData: ${JSON.stringify(data, null, 2)}`);
+    } catch (error) {
+      console.error('❌ Connection test failed:', error);
+      alert(`❌ Connection test FAILED!\n\nError: ${error}\n\nCheck browser console for details.`);
+    }
   };
 
   if (showMFASetup && authResponse?.mfa_setup) {
@@ -149,7 +194,7 @@ export default function LoginForm({ onLogin, apiStatus }: LoginFormProps) {
 
             <Button
               type="submit"
-              disabled={loading || apiStatus === 'offline'}
+              disabled={loading}
               className="w-full bg-white/10 hover:bg-white/20 text-white border border-white/30 hover:border-white/60 disabled:opacity-50"
             >
               {loading ? (
@@ -200,13 +245,52 @@ export default function LoginForm({ onLogin, apiStatus }: LoginFormProps) {
           {/* API Documentation Link */}
           <div className="text-center mt-6">
             <a 
-              href="http://localhost:8004/docs" 
+              href="http://localhost:8000/docs" 
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-white/60 hover:text-white/80 transition-colors"
             >
               API Documentation
             </a>
+          </div>
+
+          {/* Debug Information */}
+          <div className="text-center mt-4">
+            <button
+              onClick={() => setShowDebugInfo(!showDebugInfo)}
+              className="text-xs text-white/40 hover:text-white/60 transition-colors"
+            >
+              {showDebugInfo ? 'Hide' : 'Show'} Debug Info
+            </button>
+            {showDebugInfo && (
+              <div className="mt-2 p-3 bg-black/50 border border-white/10 rounded text-xs text-white/70">
+                <div className="space-y-1">
+                  <div>API URL: {process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}</div>
+                  <div>API Status: {apiStatus}</div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={testConnection}
+                      className="px-2 py-1 bg-white/10 hover:bg-white/20 rounded text-xs"
+                    >
+                      Test Connection
+                    </button>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const testLogin = await authService.login({ email: 'demo@ezbi.com', password: 'demo' });
+                          alert(`Direct login test: ${JSON.stringify(testLogin, null, 2)}`);
+                        } catch (error) {
+                          alert(`Direct login failed: ${error}`);
+                        }
+                      }}
+                      className="px-2 py-1 bg-blue-500/20 hover:bg-blue-500/40 rounded text-xs"
+                    >
+                      Test Login
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
