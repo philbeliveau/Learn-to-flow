@@ -5,13 +5,17 @@ import { Button } from '../ui/button';
 import { authService, LoginCredentials, AuthResponse } from '../../services/authService';
 import MFASetup from './MFASetup';
 import MFAVerification from './MFAVerification';
+import { EnvValidationResult } from '../../utils/envValidation';
+import { ConnectionStatus } from '../../utils/connectionMonitor';
 
 interface LoginFormProps {
   onLogin: (user: any) => void;
   apiStatus: string;
+  envValidation?: EnvValidationResult | null;
+  connectionStatus?: ConnectionStatus | null;
 }
 
-export default function LoginForm({ onLogin, apiStatus }: LoginFormProps) {
+export default function LoginForm({ onLogin, apiStatus, envValidation, connectionStatus }: LoginFormProps) {
   const [formData, setFormData] = useState<LoginCredentials>({
     email: '',
     password: '',
@@ -267,6 +271,25 @@ export default function LoginForm({ onLogin, apiStatus }: LoginFormProps) {
                 <div className="space-y-1">
                   <div>API URL: {process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}</div>
                   <div>API Status: {apiStatus}</div>
+                  {envValidation && (
+                    <div className={`text-xs ${envValidation.isValid ? 'text-green-400' : 'text-red-400'}`}>
+                      Environment: {envValidation.isValid ? '✅ Valid' : '❌ Issues detected'}
+                    </div>
+                  )}
+                  {connectionStatus && (
+                    <div className="text-xs space-y-1">
+                      <div className={connectionStatus.isConnected ? 'text-green-400' : 'text-red-400'}>
+                        Connection: {connectionStatus.isConnected ? '✅ Connected' : '❌ Disconnected'}
+                      </div>
+                      {connectionStatus.responseTime && (
+                        <div className="text-blue-400">Response: {connectionStatus.responseTime}ms</div>
+                      )}
+                      {connectionStatus.consecutiveFailures > 0 && (
+                        <div className="text-yellow-400">Failures: {connectionStatus.consecutiveFailures}</div>
+                      )}
+                      <div className="text-gray-400">Uptime: {connectionStatus.uptime.toFixed(1)}%</div>
+                    </div>
+                  )}
                   <div className="flex gap-2">
                     <button
                       onClick={testConnection}
