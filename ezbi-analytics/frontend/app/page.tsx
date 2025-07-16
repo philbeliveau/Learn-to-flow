@@ -15,6 +15,8 @@ import { cacheService } from './services/cacheService';
 import { EnvironmentValidator, EnvValidationResult } from './utils/envValidation';
 import { ConnectionMonitor, ConnectionStatus } from './utils/connectionMonitor';
 import { StartupValidator, StartupValidationResult } from './utils/startupValidator';
+import { robustApiService } from './services/robustApiService';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 export default function Home() {
   const [currentView, setCurrentView] = useState('home');
@@ -84,8 +86,17 @@ export default function Home() {
       }
     }
     
-    // Check API status
+    // Check API status using robust service
     await checkAPIStatus();
+    
+    // Test all critical endpoints
+    try {
+      console.log('🔍 Testing all critical endpoints...');
+      const endpointTests = await robustApiService.testAllEndpoints();
+      console.log('📊 Endpoint test results:', endpointTests);
+    } catch (error) {
+      console.warn('⚠️ Some endpoints may be unavailable:', error);
+    }
     
     // 🛡️ Priority 2: Start Connection Monitoring
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -116,25 +127,16 @@ export default function Home() {
 
   const checkAPIStatus = async () => {
     try {
-      // Check main API on port 8000
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      console.log('Checking API health at:', apiUrl);
+      console.log('🔍 Checking API health using robust service...');
       
-      const response = await fetch(`${apiUrl}/health`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        // Add timeout to prevent hanging
-        signal: AbortSignal.timeout(5000)
-      });
+      const healthResponse = await robustApiService.healthCheck();
       
-      if (response.ok) {
-        const data = await response.json();
+      if (healthResponse.success) {
+        const data = healthResponse.data;
         setApiStatus(data.status === 'healthy' ? 'online' : 'offline');
         console.log('✅ API Status Check SUCCESS:', data);
       } else {
-        console.warn('❌ API health check failed:', response.status, response.statusText);
+        console.warn('❌ API health check failed:', healthResponse.error);
         setApiStatus('offline');
       }
     } catch (error) {
@@ -156,6 +158,7 @@ export default function Home() {
   const handleLogout = async () => {
     await authService.logout();
     await cacheService.clear(); // Clear cache on logout
+    robustApiService.clearCache(); // Clear robust API cache
     setUser(null);
     setIsAuthenticated(false);
     setCurrentView('home');
@@ -178,11 +181,24 @@ export default function Home() {
   }
 
   if (currentView === 'dashboard' && isAuthenticated && user) {
-    return <Dashboard user={user} onLogout={handleLogout} apiStatus={apiStatus} />;
+    return (
+      <ErrorBoundary
+        onError={(error, errorInfo) => {
+          console.error('Dashboard error:', error, errorInfo);
+        }}
+      >
+        <Dashboard user={user} onLogout={handleLogout} apiStatus={apiStatus} />
+      </ErrorBoundary>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-black">
+    <ErrorBoundary
+      onError={(error, errorInfo) => {
+        console.error('App error:', error, errorInfo);
+      }}
+    >
+      <div className="min-h-screen bg-black">
       {/* 🛡️ Environment Validation Warnings */}
       {showEnvWarnings && envValidation && !envValidation.isValid && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-red-600 text-white p-4">
@@ -227,5 +243,6 @@ export default function Home() {
       </main>
       <Footer />
     </div>
+    </ErrorBoundary>
   );
 }

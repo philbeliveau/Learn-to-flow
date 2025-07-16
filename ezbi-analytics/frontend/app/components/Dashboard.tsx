@@ -40,7 +40,9 @@ import RoleGuard, { CanWriteDashboard, CanWriteAnalytics, AdminOnly, ManagerOrHi
 import { authService, User, UserRole, Permission } from '../services/authService';
 import { cacheService, CACHE_KEYS } from '../services/cacheService';
 import { syntheticDataService } from '../services/syntheticDataService';
+import { robustApiService } from '../services/robustApiService';
 import MobileResponsiveWrapper from './ui/MobileResponsiveWrapper';
+import SystemHealthDashboard from './SystemHealthDashboard';
 
 interface DashboardProps {
   user: User;
@@ -53,6 +55,7 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
   const [prediction, setPrediction] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [showHealthDashboard, setShowHealthDashboard] = useState(false);
 
   useEffect(() => {
     loadKPIs();
@@ -60,13 +63,13 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
 
   const loadKPIs = async () => {
     try {
-      // Use cache service for optimized data loading
-      const cachedKpis = await cacheService.getOrSet(
-        CACHE_KEYS.DASHBOARD_KPI,
-        () => syntheticDataService.getKPIs(),
-        300 // 5 minutes cache
-      );
-      setKpis(cachedKpis);
+      // Use robust API service for optimized data loading
+      const kpiResponse = await robustApiService.getCompanyKPIs();
+      if (kpiResponse.success) {
+        setKpis(kpiResponse.data);
+      } else {
+        console.error('Error loading KPIs:', kpiResponse.error);
+      }
     } catch (error) {
       console.error('Error loading KPIs:', error);
     }
@@ -75,13 +78,13 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
   const generatePrediction = async () => {
     setLoading(true);
     try {
-      // Use optimized prediction service with caching
-      const cachedPrediction = await cacheService.getOrSet(
-        CACHE_KEYS.CASH_FLOW_PREDICTION,
-        () => syntheticDataService.getCashFlowPrediction(30),
-        180 // 3 minutes cache for predictions
-      );
-      setPrediction(cachedPrediction);
+      // Use robust API service for predictions
+      const predictionResponse = await robustApiService.getCashFlowPrediction(30);
+      if (predictionResponse.success) {
+        setPrediction(predictionResponse.data);
+      } else {
+        console.error('Error generating prediction:', predictionResponse.error);
+      }
     } catch (error) {
       console.error('Error generating prediction:', error);
     } finally {
@@ -260,7 +263,17 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
                 {/* Role-based actions */}
                 <AdminOnly>
                   <button 
-                    onClick={() => cacheService.clear()}
+                    onClick={() => setShowHealthDashboard(true)}
+                    className="border border-white/30 hover:border-white/60 text-white px-3 py-1 text-sm font-light transition-colors"
+                    style={{backgroundColor: 'transparent'}}
+                  >
+                    System Health
+                  </button>
+                  <button 
+                    onClick={() => {
+                      cacheService.clear();
+                      robustApiService.clearCache();
+                    }}
                     className="border border-white/30 hover:border-white/60 text-white px-3 py-1 text-sm font-light transition-colors"
                     style={{backgroundColor: 'transparent'}}
                   >
@@ -286,6 +299,12 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
         </div>
       </div>
     </div>
+    
+    {/* System Health Dashboard */}
+    <SystemHealthDashboard 
+      isVisible={showHealthDashboard}
+      onClose={() => setShowHealthDashboard(false)}
+    />
     </MobileResponsiveWrapper>
   );
 }

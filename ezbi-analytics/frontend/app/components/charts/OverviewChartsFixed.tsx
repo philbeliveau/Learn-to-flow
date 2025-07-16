@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { formatCurrency } from '../../services/syntheticDataService';
-import { authService } from '../../services/authService';
+import { robustApiService } from '../../services/robustApiService';
 import useSchedulerStatus from '../../hooks/useSchedulerStatus';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import { ErrorBoundary } from '../ErrorBoundary';
 
 interface OverviewChartsProps {
   kpis: any;
@@ -59,6 +58,11 @@ const OverviewChartsFixed: React.FC<OverviewChartsProps> = ({ kpis }) => {
   const [kpiData, setKpiData] = useState<KPIData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dataStatus, setDataStatus] = useState<{
+    sales: { success: boolean; fallback: boolean; cached: boolean };
+    operations: { success: boolean; fallback: boolean; cached: boolean };
+    finance: { success: boolean; fallback: boolean; cached: boolean };
+  } | null>(null);
   const { status: schedulerStatus, loading: schedulerLoading } = useSchedulerStatus();
 
   useEffect(() => {
@@ -70,25 +74,46 @@ const OverviewChartsFixed: React.FC<OverviewChartsProps> = ({ kpis }) => {
       setLoading(true);
       setError(null);
       
-      // Get authentication headers
-      const headers = await authService.getAuthHeaders();
-      
-      // Fetch data from available manufacturing endpoints
+      // Use robust API service for all data fetching
       const [salesRes, operationsRes, financeRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/manufacturing/sales/kpis`, { headers }),
-        fetch(`${API_BASE_URL}/api/manufacturing/operations/products`, { headers }),
-        fetch(`${API_BASE_URL}/api/manufacturing/finance/summary`, { headers })
+        robustApiService.getSalesKPIs(),
+        robustApiService.getOperationsData(),
+        robustApiService.getFinanceData()
       ]);
 
-      if (!salesRes.ok || !operationsRes.ok || !financeRes.ok) {
-        throw new Error('Failed to fetch manufacturing data');
+      // Check if any request failed without fallback
+      if (!salesRes.success && !salesRes.fallback) {
+        throw new Error('Failed to fetch sales data');
+      }
+      if (!operationsRes.success && !operationsRes.fallback) {
+        throw new Error('Failed to fetch operations data');
+      }
+      if (!financeRes.success && !financeRes.fallback) {
+        throw new Error('Failed to fetch finance data');
       }
 
-      const [sales, operations, finance] = await Promise.all([
-        salesRes.json(),
-        operationsRes.json(),
-        financeRes.json()
-      ]);
+      const sales = salesRes.data;
+      const operations = operationsRes.data;
+      const finance = financeRes.data;
+
+      // Track data status for UI indicators
+      setDataStatus({
+        sales: {
+          success: salesRes.success,
+          fallback: salesRes.fallback || false,
+          cached: salesRes.cached || false
+        },
+        operations: {
+          success: operationsRes.success,
+          fallback: operationsRes.fallback || false,
+          cached: operationsRes.cached || false
+        },
+        finance: {
+          success: financeRes.success,
+          fallback: financeRes.fallback || false,
+          cached: financeRes.cached || false
+        }
+      });
 
       // Create overview data from available KPIs
       const overviewData = {
@@ -160,13 +185,29 @@ const OverviewChartsFixed: React.FC<OverviewChartsProps> = ({ kpis }) => {
   }
 
   return (
-    <div className="space-y-6">
+    <ErrorBoundary
+      onError={(error, errorInfo) => {
+        console.error('OverviewChartsFixed error:', error, errorInfo);
+      }}
+      resetOnPropsChange={true}
+    >
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-light text-white">Vue d'ensemble</h2>
         <div className="flex gap-2">
           <span className="bg-blue-600 px-3 py-1 rounded-full text-sm">Manufacturing Tables</span>
-          <span className="bg-green-600 px-3 py-1 rounded-full text-sm">Live Data</span>
+          {dataStatus && (
+            <>
+              {dataStatus.sales.fallback || dataStatus.operations.fallback || dataStatus.finance.fallback ? (
+                <span className="bg-yellow-600 px-3 py-1 rounded-full text-sm">Fallback Data</span>
+              ) : dataStatus.sales.cached || dataStatus.operations.cached || dataStatus.finance.cached ? (
+                <span className="bg-purple-600 px-3 py-1 rounded-full text-sm">Cached Data</span>
+              ) : (
+                <span className="bg-green-600 px-3 py-1 rounded-full text-sm">Live Data</span>
+              )}
+            </>
+          )}
         </div>
       </div>
 
@@ -364,6 +405,7 @@ const OverviewChartsFixed: React.FC<OverviewChartsProps> = ({ kpis }) => {
         </div>
       </div>
     </div>
+    </ErrorBoundary>
   );
 };
 
