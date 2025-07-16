@@ -6,7 +6,7 @@
 
 // API Base URLs for our synthetic data sources
 const CASH_FLOW_API_BASE = 'http://localhost:8000'; // Our cash flow prediction API
-const MANUFACTURING_API_BASE = 'http://localhost:8004'; // Existing EZBI API
+const MANUFACTURING_API_BASE = 'http://localhost:8000'; // Fixed: Use same port as backend
 
 export interface SyntheticDataConfig {
   useCashFlowAPI: boolean;
@@ -27,12 +27,18 @@ export class SyntheticDataService {
     this.config = config;
   }
 
-  private getAuthHeaders(): HeadersInit {
-    const token = localStorage.getItem('access_token');
-    return {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
+  private async getAuthHeaders(): Promise<HeadersInit> {
+    try {
+      const token = localStorage.getItem('access_token');
+      return {
+        'Authorization': token ? `Bearer ${token}` : '',
+        'Content-Type': 'application/json'
+      };
+    } catch (error) {
+      return {
+        'Content-Type': 'application/json'
+      };
+    }
   }
 
   /**
@@ -47,7 +53,7 @@ export class SyntheticDataService {
     try {
       const response = await fetch(
         `${CASH_FLOW_API_BASE}/api/v1/current-cash-position`,
-        { headers: this.getAuthHeaders() }
+        { headers: await this.getAuthHeaders() }
       );
       
       if (!response.ok) {
@@ -80,7 +86,7 @@ export class SyntheticDataService {
     try {
       const response = await fetch(
         `${CASH_FLOW_API_BASE}/api/v1/quick-prediction?days=${days}`,
-        { headers: this.getAuthHeaders() }
+        { headers: await this.getAuthHeaders() }
       );
       
       if (!response.ok) {
@@ -113,7 +119,7 @@ export class SyntheticDataService {
     try {
       const response = await fetch(
         `${CASH_FLOW_API_BASE}/api/v1/cash-flow-dashboard`,
-        { headers: this.getAuthHeaders() }
+        { headers: await this.getAuthHeaders() }
       );
       
       if (!response.ok) {
@@ -148,7 +154,7 @@ export class SyntheticDataService {
         `${CASH_FLOW_API_BASE}/api/v1/predict-cash-flow`,
         {
           method: 'POST',
-          headers: this.getAuthHeaders(),
+          headers: await this.getAuthHeaders(),
           body: JSON.stringify({
             start_date: startDate,
             end_date: endDate,
@@ -188,7 +194,7 @@ export class SyntheticDataService {
     try {
       const response = await fetch(
         `${MANUFACTURING_API_BASE}/api/v1/analytics/cash-flow-timeline?timeframe=${timeframe}`,
-        { headers: this.getAuthHeaders() }
+        { headers: await this.getAuthHeaders() }
       );
       
       if (!response.ok) {
@@ -220,7 +226,7 @@ export class SyntheticDataService {
     try {
       const response = await fetch(
         `${MANUFACTURING_API_BASE}/api/v1/analytics/banking-trends`,
-        { headers: this.getAuthHeaders() }
+        { headers: await this.getAuthHeaders() }
       );
       
       if (!response.ok) {
@@ -252,7 +258,7 @@ export class SyntheticDataService {
     try {
       const response = await fetch(
         `${MANUFACTURING_API_BASE}/api/v1/company/kpis`,
-        { headers: this.getAuthHeaders() }
+        { headers: await this.getAuthHeaders() }
       );
       
       if (!response.ok) {

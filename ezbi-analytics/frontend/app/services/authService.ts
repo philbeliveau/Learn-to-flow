@@ -450,20 +450,22 @@ export class AuthService {
    */
   public async getAuthHeaders(): Promise<HeadersInit> {
     if (typeof window === 'undefined') {
-      throw new Error('Authentication required');
+      return {
+        'Content-Type': 'application/json'
+      };
     }
     
     const token = localStorage.getItem(ACCESS_TOKEN_KEY);
     
     if (!token || !this.isTokenValid(token)) {
-      const refreshed = await this.refreshToken();
-      if (!refreshed) {
-        throw new Error('Authentication required');
-      }
+      // Try to refresh, but don't throw error if it fails
+      await this.refreshToken().catch(() => {});
     }
 
+    const finalToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+    
     return {
-      'Authorization': `Bearer ${localStorage.getItem(ACCESS_TOKEN_KEY)}`,
+      'Authorization': finalToken ? `Bearer ${finalToken}` : '',
       'Content-Type': 'application/json'
     };
   }

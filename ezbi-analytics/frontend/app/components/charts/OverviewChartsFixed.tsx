@@ -5,7 +5,7 @@ import { formatCurrency } from '../../services/syntheticDataService';
 import { authService } from '../../services/authService';
 import useSchedulerStatus from '../../hooks/useSchedulerStatus';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8003';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 interface OverviewChartsProps {
   kpis: any;
@@ -76,8 +76,8 @@ const OverviewChartsFixed: React.FC<OverviewChartsProps> = ({ kpis }) => {
       // Fetch data from available manufacturing endpoints
       const [salesRes, operationsRes, financeRes] = await Promise.all([
         fetch(`${API_BASE_URL}/api/manufacturing/sales/kpis`, { headers }),
-        fetch(`${API_BASE_URL}/api/manufacturing/operations/kpis`, { headers }),
-        fetch(`${API_BASE_URL}/api/manufacturing/finance/kpis`, { headers })
+        fetch(`${API_BASE_URL}/api/manufacturing/operations/products`, { headers }),
+        fetch(`${API_BASE_URL}/api/manufacturing/finance/summary`, { headers })
       ]);
 
       if (!salesRes.ok || !operationsRes.ok || !financeRes.ok) {
@@ -93,23 +93,36 @@ const OverviewChartsFixed: React.FC<OverviewChartsProps> = ({ kpis }) => {
       // Create overview data from available KPIs
       const overviewData = {
         overview: {
-          total_customers: sales.active_customers,
-          total_revenue: sales.total_revenue,
+          total_customers: sales.total_customers,
+          total_revenue: sales.revenue_this_month,
           total_orders: operations.total_production_orders,
-          total_units_produced: operations.completed_orders,
+          total_units_produced: operations.active_orders,
           active_employees: 30, // Static for now
-          monthly_fixed_costs: finance.monthly_payments,
-          total_debt: finance.total_debt,
-          total_receivables: sales.total_revenue * 0.2
+          monthly_fixed_costs: finance.monthly_burn_rate,
+          total_debt: finance.debt_accounts,
+          total_receivables: finance.accounts_receivable
         },
         recent_activity: []
       };
       
       setOverviewData(overviewData);
       setKpiData({
-        sales: sales,
-        operations: operations,
-        finance: finance,
+        sales: {
+          total_revenue: sales.revenue_this_month,
+          total_invoices: sales.total_invoices,
+          active_customers: sales.total_customers,
+          avg_invoice_value: sales.avg_order_value
+        },
+        operations: {
+          total_orders: operations.total_production_orders,
+          total_units_produced: operations.active_orders,
+          avg_efficiency: operations.production_efficiency
+        },
+        finance: {
+          total_debt: finance.debt_accounts,
+          total_outstanding: finance.accounts_receivable,
+          avg_interest_rate: 0.045 // Static for now
+        },
         hr: { total_employees: 30, avg_salary: 45000, departments: 5 }
       });
     } catch (err) {
@@ -331,7 +344,7 @@ const OverviewChartsFixed: React.FC<OverviewChartsProps> = ({ kpis }) => {
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="flex justify-between">
               <span className="text-blue-300">Manufacturing API:</span>
-              <span className="text-green-400">✅ Port 8003</span>
+              <span className="text-green-400">✅ Port 8000</span>
             </div>
             <div className="flex justify-between">
               <span className="text-blue-300">Base de données:</span>
