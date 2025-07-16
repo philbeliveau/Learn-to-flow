@@ -45,8 +45,9 @@ export default function Home() {
 
   const checkAPIStatus = async () => {
     try {
-      // Check auth API on port 8004 (primary for authentication)
-      const response = await fetch('http://localhost:8004/health');
+      // Check main API on port 8000
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/health`);
       if (response.ok) {
         const data = await response.json();
         setApiStatus(data.status === 'healthy' ? 'online' : 'offline');
@@ -54,19 +55,8 @@ export default function Home() {
         setApiStatus('offline');
       }
     } catch (error) {
-      console.warn('Auth API (8004) unavailable, checking manufacturing API (8003)');
-      try {
-        // Fallback to port 8003 for manufacturing data
-        const fallbackResponse = await fetch('http://localhost:8003/health');
-        if (fallbackResponse.ok) {
-          const data = await fallbackResponse.json();
-          setApiStatus(data.status === 'healthy' ? 'online' : 'offline');
-        } else {
-          setApiStatus('offline');
-        }
-      } catch (fallbackError) {
-        setApiStatus('offline');
-      }
+      console.error('API unavailable:', error);
+      setApiStatus('offline');
     }
   };
 

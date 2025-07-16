@@ -6,8 +6,8 @@
 
 import { jwtDecode } from 'jwt-decode';
 
-// API Configuration - Use authentication server on port 8004
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004';
+// API Configuration - Use main API server
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 const ACCESS_TOKEN_KEY = 'access_token';
 const USER_DATA_KEY = 'user_data';
