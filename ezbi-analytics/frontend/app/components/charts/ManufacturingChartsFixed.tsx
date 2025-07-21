@@ -9,6 +9,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 interface ManufacturingChartsProps {
   chartOptions: any;
+  pieChartOptions?: any;
 }
 
 interface OperationsData {
