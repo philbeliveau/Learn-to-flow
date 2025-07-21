@@ -5,13 +5,15 @@ import { Line } from 'react-chartjs-2';
 
 interface PredictionsChartsProps {
   chartOptions: any;
-  prediction: any;
-  generatePrediction: () => void;
-  loading: boolean;
+  pieChartOptions?: any;
+  prediction?: any;
+  generatePrediction?: () => void;
+  loading?: boolean;
 }
 
 const PredictionsCharts: React.FC<PredictionsChartsProps> = ({ 
-  chartOptions, 
+  chartOptions,
+  pieChartOptions,
   prediction, 
   generatePrediction, 
   loading 
