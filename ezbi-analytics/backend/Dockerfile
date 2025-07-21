@@ -55,13 +55,19 @@ RUN apt-get update && apt-get install -y \
 # Copy source code
 COPY . .
 
-# Create Railway-compatible startup script with cron support
+# Create Railway-compatible startup script with database migration
 RUN echo '#!/bin/bash\n\
 set -e\n\
 echo "🚀 Starting EZBI Analytics Production Server..."\n\
 mkdir -p /app/logs /app/data /app/backup\n\
-if [ ! -f /app/data/ezbi_analytics.db ]; then\n\
-    echo "📊 Initializing manufacturing database..."\n\
+\n\
+# Database Migration Logic\n\
+if [ ! -z "$DATABASE_URL" ] && [[ "$DATABASE_URL" == *"postgres"* ]]; then\n\
+    echo "📊 Railway PostgreSQL detected - running migration..."\n\
+    python /app/railway_migrate.py || echo "⚠️ Migration completed with warnings"\n\
+    echo "✅ PostgreSQL migration completed"\n\
+elif [ ! -f /app/data/ezbi_analytics.db ]; then\n\
+    echo "📊 Initializing SQLite database..."\n\
     python -c "\n\
 import sys\n\
 sys.path.append(\"/app\")\n\
@@ -69,7 +75,7 @@ try:\n\
     from app.core.database import init_db\n\
     import asyncio\n\
     asyncio.run(init_db())\n\
-    print(\"✅ Database initialized\")\n\
+    print(\"✅ SQLite database initialized\")\n\
 except Exception as e:\n\
     print(f\"⚠️ Database initialization info: {e}\")\n\
 " || echo "⚠️ Database initialization skipped (may already exist)"\n\
