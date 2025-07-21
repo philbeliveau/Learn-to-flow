@@ -62,31 +62,38 @@ echo "🚀 Starting EZBI Analytics Production Server..."\n\
 mkdir -p /app/logs /app/data /app/backup\n\
 \n\
 # Database Migration Logic\n\
-if [ ! -z "$DATABASE_URL" ] && [[ "$DATABASE_URL" == *"postgres"* ]]; then\n\
-    echo "📊 Railway PostgreSQL detected - running migration..."\n\
-    python /app/railway_migrate.py || echo "⚠️ Migration completed with warnings"\n\
-    echo "✅ PostgreSQL migration completed"\n\
-elif [ ! -f /app/data/ezbi_analytics.db ]; then\n\
-    echo "📊 Initializing SQLite database..."\n\
-    python -c "\n\
-import sys\n\
+if [ ! -z "$DATABASE_URL" ] && [[ "$DATABASE_URL" == *"postgres"* ]] && [[ "$DATABASE_URL" != *"postgresql://user:pass@host:5432"* ]]; then\n\
+    echo "📊 Valid PostgreSQL URL detected - running migration..."\n\
+    python /app/railway_migrate.py && echo "✅ PostgreSQL migration completed" || {\n\
+        echo "⚠️ PostgreSQL migration failed, falling back to SQLite"\n\
+        python -c "\n\
+import sys, asyncio\n\
 sys.path.append(\"/app\")\n\
-try:\n\
-    from app.core.database import init_db\n\
-    import asyncio\n\
-    asyncio.run(init_db())\n\
-    print(\"✅ SQLite database initialized\")\n\
-except Exception as e:\n\
-    print(f\"⚠️ Database initialization info: {e}\")\n\
-" || echo "⚠️ Database initialization skipped (may already exist)"\n\
+from app.core.database import init_db\n\
+asyncio.run(init_db())\n\
+" && echo "✅ SQLite fallback initialized"\n\
+    }\n\
+elif [ ! -f /app/data/ezbi_analytics.db ]; then\n\
+    echo "📊 No PostgreSQL available - using SQLite database..."\n\
+    python -c "\n\
+import sys, asyncio\n\
+sys.path.append(\"/app\")\n\
+from app.core.database import init_db\n\
+asyncio.run(init_db())\n\
+" && echo "✅ SQLite database initialized"\n\
+else\n\
+    echo "✅ Using existing SQLite database"\n\
 fi\n\
 \n\
 # Setup cron jobs\n\
 if [ -f /app/deployment/crontab ]; then\n\
     echo "⏰ Setting up cron jobs..."\n\
-    crontab /app/deployment/crontab\n\
-    service cron start\n\
-    echo "✅ Cron jobs configured"\n\
+    if crontab /app/deployment/crontab 2>/dev/null; then\n\
+        service cron start\n\
+        echo "✅ Cron jobs configured"\n\
+    else\n\
+        echo "⚠️ Cron setup failed, continuing without scheduled jobs"\n\
+    fi\n\
 else\n\
     echo "⚠️ No crontab file found, skipping cron setup"\n\
 fi\n\
