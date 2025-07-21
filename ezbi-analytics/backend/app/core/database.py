@@ -15,41 +15,61 @@ from app.core.config import settings
 logger = structlog.get_logger()
 
 # Create async engine with enhanced configuration
-async_engine = create_async_engine(
-    settings.async_database_url,
-    echo=settings.DATABASE_ECHO,
-    echo_pool=bool(os.getenv('DB_ECHO_POOL', 'false').lower() == 'true'),
-    poolclass=QueuePool,
-    pool_size=settings.DATABASE_POOL_SIZE,
-    max_overflow=settings.DATABASE_MAX_OVERFLOW,
-    pool_timeout=settings.DATABASE_POOL_TIMEOUT,
-    pool_pre_ping=True,
-    pool_recycle=3600,  # 1 hour for production
-    pool_reset_on_return='commit',
-    connect_args={
-        'server_settings': {
-            'application_name': 'EZBI_Analytics_Production',
-            'timezone': 'UTC',
-            'statement_timeout': '30000',  # 30 seconds
-            'idle_in_transaction_session_timeout': '60000',  # 60 seconds
-            'log_statement': 'all',
-            'log_min_duration_statement': '1000',  # Log queries > 1 second
+if "sqlite" in settings.DATABASE_URL:
+    # SQLite configuration
+    async_engine = create_async_engine(
+        settings.async_database_url,
+        echo=settings.DATABASE_ECHO,
+        connect_args={
+            'check_same_thread': False,
         }
-    }
-)
+    )
+else:
+    # PostgreSQL configuration 
+    async_engine = create_async_engine(
+        settings.async_database_url,
+        echo=settings.DATABASE_ECHO,
+        echo_pool=bool(os.getenv('DB_ECHO_POOL', 'false').lower() == 'true'),
+        poolclass=QueuePool,
+        pool_size=settings.DATABASE_POOL_SIZE,
+        max_overflow=settings.DATABASE_MAX_OVERFLOW,
+        pool_timeout=settings.DATABASE_POOL_TIMEOUT,
+        pool_pre_ping=True,
+        pool_recycle=3600,  # 1 hour for production
+        pool_reset_on_return='commit',
+        connect_args={
+            'server_settings': {
+                'application_name': 'EZBI_Analytics_Production',
+                'timezone': 'UTC',
+                'statement_timeout': '30000',  # 30 seconds
+                'idle_in_transaction_session_timeout': '60000',  # 60 seconds
+                'log_statement': 'all',
+                'log_min_duration_statement': '1000',  # Log queries > 1 second
+            }
+        }
+    )
 
-# Create sync engine for migrations
-sync_engine = create_engine(
-    settings.sync_database_url,
-    echo=settings.DATABASE_ECHO,
-    poolclass=QueuePool,
-    pool_size=settings.DATABASE_POOL_SIZE,
-    max_overflow=settings.DATABASE_MAX_OVERFLOW,
-    pool_timeout=settings.DATABASE_POOL_TIMEOUT,
-    pool_pre_ping=True,
-    pool_recycle=3600,
-    pool_reset_on_return='commit',
-)
+# Create sync engine for migrations  
+if "sqlite" in settings.DATABASE_URL:
+    # SQLite configuration
+    sync_engine = create_engine(
+        settings.sync_database_url,
+        echo=settings.DATABASE_ECHO,
+        connect_args={'check_same_thread': False}
+    )
+else:
+    # PostgreSQL configuration
+    sync_engine = create_engine(
+        settings.sync_database_url,
+        echo=settings.DATABASE_ECHO,
+        poolclass=QueuePool,
+        pool_size=settings.DATABASE_POOL_SIZE,
+        max_overflow=settings.DATABASE_MAX_OVERFLOW,
+        pool_timeout=settings.DATABASE_POOL_TIMEOUT,
+        pool_pre_ping=True,
+        pool_recycle=3600,
+        pool_reset_on_return='commit',
+    )
 
 # Create async session maker
 AsyncSessionLocal = async_sessionmaker(
@@ -71,10 +91,11 @@ SessionLocal = sessionmaker(
 Base = declarative_base()
 
 # Database connection events
-@event.listens_for(async_engine.sync_engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    """Set SQLite pragmas for better performance (if using SQLite)."""
-    if "sqlite" in settings.DATABASE_URL:
+if "sqlite" in settings.DATABASE_URL:
+    # SQLite-specific events
+    @event.listens_for(sync_engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        """Set SQLite pragmas for better performance."""
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.execute("PRAGMA journal_mode=WAL")
@@ -82,16 +103,18 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
         cursor.execute("PRAGMA cache_size=10000")
         cursor.execute("PRAGMA temp_store=MEMORY")
         cursor.close()
+        logger.info("SQLite pragmas configured")
+else:
+    # PostgreSQL-specific events
+    @event.listens_for(async_engine.sync_engine, "connect")
+    def receive_connect(dbapi_connection, connection_record):
+        """Log database connections."""
+        logger.info("Database connection established")
 
-@event.listens_for(async_engine.sync_engine, "engine_connect")
-def receive_engine_connect(dbapi_connection, connection_record):
-    """Log database connections."""
-    logger.info("Database connection established")
-
-@event.listens_for(async_engine.sync_engine, "engine_dispose")
-def receive_engine_dispose(dbapi_connection, connection_record):
-    """Log database disconnections."""
-    logger.info("Database connection disposed")
+    @event.listens_for(async_engine.sync_engine, "engine_dispose")
+    def receive_engine_dispose(dbapi_connection, connection_record):
+        """Log database disconnections."""
+        logger.info("Database connection disposed")
 
 # Session dependency
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:

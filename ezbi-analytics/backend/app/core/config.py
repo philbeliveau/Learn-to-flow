@@ -1,4 +1,5 @@
-from pydantic import BaseSettings, Field, validator
+from pydantic import Field, validator
+from pydantic_settings import BaseSettings
 from typing import List, Optional, Any
 import secrets
 import os
@@ -31,8 +32,8 @@ class Settings(BaseSettings):
     ENCRYPTION_MASTER_KEY: str = Field(default_factory=lambda: secrets.token_urlsafe(32))
     FERNET_KEY: Optional[str] = None
     
-    # Database settings
-    DATABASE_URL: str = Field(default="postgresql+asyncpg://postgres:password@localhost/ezbi_analytics")
+    # Database settings  
+    DATABASE_URL: str = Field(default="sqlite+aiosqlite:///data/ezbi_analytics.db")
     DATABASE_POOL_SIZE: int = Field(default=10)
     DATABASE_MAX_OVERFLOW: int = Field(default=20)
     DATABASE_POOL_TIMEOUT: int = Field(default=30)

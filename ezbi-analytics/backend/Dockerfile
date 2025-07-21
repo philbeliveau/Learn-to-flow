@@ -47,14 +47,19 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload
 # Production stage
 FROM base as production
 
+# Install cron for job scheduling
+RUN apt-get update && apt-get install -y \
+    cron \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy source code
 COPY . .
 
-# Create Railway-compatible startup script
+# Create Railway-compatible startup script with cron support
 RUN echo '#!/bin/bash\n\
 set -e\n\
 echo "🚀 Starting EZBI Analytics Production Server..."\n\
-mkdir -p /app/logs /app/data\n\
+mkdir -p /app/logs /app/data /app/backup\n\
 if [ ! -f /app/data/ezbi_analytics.db ]; then\n\
     echo "📊 Initializing manufacturing database..."\n\
     python -c "\n\
@@ -62,12 +67,24 @@ import sys\n\
 sys.path.append(\"/app\")\n\
 try:\n\
     from app.core.database import init_db\n\
-    init_db()\n\
+    import asyncio\n\
+    asyncio.run(init_db())\n\
     print(\"✅ Database initialized\")\n\
 except Exception as e:\n\
     print(f\"⚠️ Database initialization info: {e}\")\n\
 " || echo "⚠️ Database initialization skipped (may already exist)"\n\
 fi\n\
+\n\
+# Setup cron jobs\n\
+if [ -f /app/deployment/crontab ]; then\n\
+    echo "⏰ Setting up cron jobs..."\n\
+    crontab /app/deployment/crontab\n\
+    service cron start\n\
+    echo "✅ Cron jobs configured"\n\
+else\n\
+    echo "⚠️ No crontab file found, skipping cron setup"\n\
+fi\n\
+\n\
 echo "🌟 Starting FastAPI server on port ${PORT:-8000}..."\n\
 exec uvicorn app.main:app \\\n\
     --host 0.0.0.0 \\\n\

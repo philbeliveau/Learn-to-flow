@@ -31,11 +31,11 @@ ChartJS.register(
 
 import NavigationSidebar from './NavigationSidebar';
 import OverviewChartsFixed from './charts/OverviewChartsFixed';
-import FinancialCharts from './charts/FinancialCharts';
+import FinancialChartsFixed from './charts/FinancialChartsFixed';
 import ManufacturingCharts from './charts/ManufacturingCharts';
 import ManufacturingChartsFixed from './charts/ManufacturingChartsFixed';
 import PredictionsCharts from './charts/PredictionsCharts';
-import AnalyticsCharts from './charts/AnalyticsCharts';
+import AnalyticsChartsFixed from './charts/AnalyticsChartsFixed';
 import ManufacturingDashboardSimple from './charts/ManufacturingDashboardSimple';
 import RoleGuard, { CanWriteDashboard, CanWriteAnalytics, AdminOnly, ManagerOrHigher } from './auth/RoleGuard';
 import { authService, User, UserRole, Permission } from '../services/authService';
@@ -201,7 +201,7 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
       case 'overview':
         return <OverviewChartsFixed kpis={kpis} />;
       case 'financial':
-        return <FinancialCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
+        return <FinancialChartsFixed chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       case 'manufacturing':
         return <ManufacturingChartsFixed chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       case 'manufacturing-bi':
@@ -209,7 +209,7 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
       case 'predictions':
         return <PredictionsCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       case 'analytics':
-        return <AnalyticsCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
+        return <AnalyticsChartsFixed chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       default:
         return <OverviewChartsFixed kpis={kpis} />;
     }

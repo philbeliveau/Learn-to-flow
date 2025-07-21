@@ -56,7 +56,7 @@ class ManufacturingDataGenerator:
             
             seasonal_mult = self.get_seasonal_multiplier()
             
-            async with get_async_session() as db:
+            async for db in get_async_session():
                 # 1. Generate new customer orders (2-8 per day, seasonally adjusted)
                 base_orders = random.randint(2, 8)
                 order_count = max(1, int(base_orders * seasonal_mult))
@@ -66,19 +66,21 @@ class ManufacturingDataGenerator:
                     units_ordered = random.randint(50, 500) * seasonal_mult
                     
                     await db.execute(text("""
-                        INSERT INTO operations.production_orders 
-                        (order_number, product_id, customer_id, start_date, units_ordered, status)
+                        INSERT INTO operations_production_orders 
+                        (order_number, product_id, customer_id, start_date, expected_completion, units_ordered, status)
                         VALUES (
                             :order_number,
-                            (SELECT product_id FROM operations.products ORDER BY RANDOM() LIMIT 1),
-                            (SELECT customer_id FROM sales.customers ORDER BY RANDOM() LIMIT 1),
+                            (SELECT product_id FROM operations_products ORDER BY RANDOM() LIMIT 1),
+                            (SELECT customer_id FROM sales_customers ORDER BY RANDOM() LIMIT 1),
                             :start_date,
+                            :expected_completion,
                             :units_ordered,
                             'Planned'
                         )
                     """), {
                         'order_number': order_number,
                         'start_date': datetime.now(),
+                        'expected_completion': datetime.now() + timedelta(days=random.randint(7, 21)),
                         'units_ordered': int(units_ordered)
                     })
                 
@@ -92,11 +94,11 @@ class ManufacturingDataGenerator:
                     amount = base_amount * seasonal_mult
                     
                     await db.execute(text("""
-                        INSERT INTO sales.invoices 
+                        INSERT INTO sales_invoices 
                         (invoice_number, customer_id, date_issued, due_date, amount, status)
                         VALUES (
                             :invoice_number,
-                            (SELECT customer_id FROM sales.customers ORDER BY RANDOM() LIMIT 1),
+                            (SELECT customer_id FROM sales_customers ORDER BY RANDOM() LIMIT 1),
                             :date_issued,
                             :due_date,
                             :amount,
@@ -127,7 +129,7 @@ class ManufacturingDataGenerator:
                     ]
                     
                     await db.execute(text("""
-                        INSERT INTO finance.cash_ledger 
+                        INSERT INTO finance_cash_ledger 
                         (transaction_number, transaction_type, amount, counterparty, date_recorded)
                         VALUES (:txn_number, :txn_type, :amount, :counterparty, :date_recorded)
                     """), {

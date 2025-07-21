@@ -50,7 +50,7 @@ class CashFlowAnalyzer:
                 print("💡 Database not available, running cash flow simulation")
                 return await self.simulate_cash_flow_analysis()
             
-            async with get_async_session() as db:
+            async for db in get_async_session():
                 # 1. Current cash position analysis
                 cash_analysis = await self._analyze_cash_position(db)
                 
