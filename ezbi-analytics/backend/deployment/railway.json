@@ -1,0 +1,37 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile"
+  },
+  "deploy": {
+    "startCommand": "/app/start.sh",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 300,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 3
+  },
+  "environments": {
+    "production": {
+      "variables": {
+        "ENVIRONMENT": "production",
+        "LOG_LEVEL": "info",
+        "DATABASE_URL": "sqlite:///app/data/ezbi_analytics.db",
+        "CORS_ORIGINS": "https://ezbi-analytics.vercel.app,https://ezbi-analytics-*.vercel.app",
+        "RATE_LIMIT_REQUESTS": "1000",
+        "RATE_LIMIT_WINDOW": "3600"
+      }
+    },
+    "staging": {
+      "variables": {
+        "ENVIRONMENT": "staging",
+        "LOG_LEVEL": "debug",
+        "DATABASE_URL": "sqlite:///app/data/ezbi_analytics_staging.db",
+        "CORS_ORIGINS": "*"
+      }
+    }
+  },
+  "regions": [
+    "us-west1"
+  ]
+}

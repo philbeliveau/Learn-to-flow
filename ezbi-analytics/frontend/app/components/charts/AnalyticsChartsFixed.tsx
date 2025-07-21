@@ -81,26 +81,26 @@ const AnalyticsChartsFixed: React.FC<AnalyticsChartsProps> = ({ chartOptions, pi
       setLoading(true);
       setError(null);
       
-      // Fetch comprehensive analytics from all manufacturing tables
+      // Fetch comprehensive analytics from all manufacturing tables using robustApiService  
       const [overviewRes, salesRes, operationsRes, financeRes, hrRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/manufacturing/dashboard/overview`),
-        fetch(`${API_BASE_URL}/api/manufacturing/sales/kpis`),
-        fetch(`${API_BASE_URL}/api/manufacturing/operations/kpis`),
-        fetch(`${API_BASE_URL}/api/manufacturing/finance/kpis`),
-        fetch(`${API_BASE_URL}/api/manufacturing/hr/kpis`)
+        robustApiService.apiCall('/api/manufacturing/dashboard/overview'),
+        robustApiService.apiCall('/api/manufacturing/sales/kpis'),
+        robustApiService.apiCall('/api/manufacturing/operations/kpis'),
+        robustApiService.apiCall('/api/manufacturing/finance/kpis'),
+        robustApiService.apiCall('/api/manufacturing/hr/kpis')
       ]);
 
-      if (!overviewRes.ok || !salesRes.ok || !operationsRes.ok || !financeRes.ok || !hrRes.ok) {
+      if (!overviewRes.success || !salesRes.success || !operationsRes.success || !financeRes.success || !hrRes.success) {
         throw new Error('Failed to fetch analytics data');
       }
 
-      const [overview, sales, operations, finance, hr] = await Promise.all([
-        overviewRes.json(),
-        salesRes.json(),
-        operationsRes.json(),
-        financeRes.json(),
-        hrRes.json()
-      ]);
+      const [overview, sales, operations, finance, hr] = [
+        overviewRes.data,
+        salesRes.data,
+        operationsRes.data,
+        financeRes.data,
+        hrRes.data
+      ];
 
       setAnalyticsData({
         overview: overview.overview,

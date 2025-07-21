@@ -5,7 +5,7 @@ import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { formatCurrency } from '../../services/syntheticDataService';
 import { authService } from '../../services/authService';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 interface CashFlowPredictionDashboardProps {
   chartOptions: any;

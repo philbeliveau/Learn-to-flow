@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { formatCurrency } from '../../services/syntheticDataService';
+import { robustApiService } from '../../services/robustApiService';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 interface ManufacturingChartsProps {
   chartOptions: any;
@@ -76,26 +77,20 @@ const ManufacturingChartsFixed: React.FC<ManufacturingChartsProps> = ({ chartOpt
       setLoading(true);
       setError(null);
       
-      // Fetch all manufacturing data from operations tables
+      // Fetch all manufacturing data from operations tables using robustApiService
       const [operationsRes, productsRes, ordersRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/api/manufacturing/operations/kpis`),
-        fetch(`${API_BASE_URL}/api/manufacturing/operations/products`),
-        fetch(`${API_BASE_URL}/api/manufacturing/operations/production-orders`)
+        robustApiService.apiCall('/api/manufacturing/operations/kpis'),
+        robustApiService.apiCall('/api/manufacturing/operations/products'),
+        robustApiService.apiCall('/api/manufacturing/operations/production-orders')
       ]);
 
-      if (!operationsRes.ok || !productsRes.ok || !ordersRes.ok) {
+      if (!operationsRes.success || !productsRes.success || !ordersRes.success) {
         throw new Error('Failed to fetch manufacturing data');
       }
 
-      const [operations, products, orders] = await Promise.all([
-        operationsRes.json(),
-        productsRes.json(),
-        ordersRes.json()
-      ]);
-
-      setOperationsData(operations);
-      setProductsData(products);
-      setOrdersData(orders);
+      setOperationsData(operationsRes.data);
+      setProductsData(productsRes.data);
+      setOrdersData(ordersRes.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load manufacturing data');
       console.error('Failed to load manufacturing data:', err);

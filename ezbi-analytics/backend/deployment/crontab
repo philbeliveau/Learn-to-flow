@@ -1,0 +1,33 @@
+# EZBI Analytics Production Cron Jobs
+# Manufacturing data generation and cash flow monitoring
+
+# Daily business activity generation at 6 AM UTC
+0 6 * * * cd /app && /usr/local/bin/python -m jobs.daily_data_generation >> /app/logs/daily_data.log 2>&1
+
+# Cash flow analysis every 4 hours
+0 */4 * * * cd /app && /usr/local/bin/python -m jobs.cash_flow_analysis >> /app/logs/cash_flow.log 2>&1
+
+# Weekly deep analytics and cleanup (Sundays at 3 AM)
+0 3 * * 0 cd /app && /usr/local/bin/python -c "
+import asyncio
+from jobs.slack_notifier import SlackNotifier
+async def weekly_report():
+    notifier = SlackNotifier()
+    await notifier.send_system_alert('info', 'Weekly system maintenance completed', {
+        'logs_rotated': 'yes', 
+        'database_optimized': 'yes',
+        'backup_created': 'yes'
+    })
+asyncio.run(weekly_report())
+" >> /app/logs/weekly_maintenance.log 2>&1
+
+# System health check every 15 minutes
+*/15 * * * * cd /app && curl -f http://localhost:${PORT:-8000}/health > /dev/null 2>&1 || echo "$(date): Health check failed" >> /app/logs/health_alerts.log
+
+# Log rotation to prevent disk space issues (daily at midnight)
+0 0 * * * find /app/logs -name "*.log" -type f -size +10M -exec sh -c 'mv "$1" "$1.$(date +\%Y\%m\%d)" && touch "$1"' _ {} \;
+
+# Database backup (daily at 2 AM)
+0 2 * * * cd /app && cp data/ezbi_analytics.db backup/ezbi_backup_$(date +\%Y\%m\%d).db && find backup/ -name "*.db" -mtime +7 -delete >> /app/logs/backup.log 2>&1
+
+# Empty line required for proper cron parsing

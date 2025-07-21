@@ -35,7 +35,7 @@ export class CacheService {
 
   private constructor(config: CacheConfig = DEFAULT_CACHE_CONFIG) {
     this.config = config;
-    this.apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004';
+    this.apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
     
     // Clean up expired entries periodically
     setInterval(() => this.cleanupExpiredEntries(), 60000); // Every minute
