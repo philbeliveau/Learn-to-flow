@@ -55,6 +55,10 @@ RUN apt-get update && apt-get install -y \
 # Copy source code
 COPY . .
 
+# Copy minimal startup script and set permissions BEFORE user switch
+COPY minimal_start.sh /app/minimal_start.sh
+RUN chmod +x /app/minimal_start.sh
+
 # Create Railway-compatible startup script with database migration
 RUN echo '#!/bin/bash\n\
 set -e\n\
@@ -114,10 +118,6 @@ EXPOSE 8000
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
-
-# Use minimal startup for debugging
-COPY minimal_start.sh /app/minimal_start.sh
-RUN chmod +x /app/minimal_start.sh
 
 # Command for production
 CMD ["/app/minimal_start.sh"]
