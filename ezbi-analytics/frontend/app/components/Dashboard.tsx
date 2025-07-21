@@ -33,6 +33,7 @@ import NavigationSidebar from './NavigationSidebar';
 import OverviewChartsFixed from './charts/OverviewChartsFixed';
 import FinancialCharts from './charts/FinancialCharts';
 import ManufacturingCharts from './charts/ManufacturingCharts';
+import ManufacturingChartsFixed from './charts/ManufacturingChartsFixed';
 import PredictionsCharts from './charts/PredictionsCharts';
 import AnalyticsCharts from './charts/AnalyticsCharts';
 import ManufacturingDashboardSimple from './charts/ManufacturingDashboardSimple';
@@ -202,7 +203,7 @@ export default function Dashboard({ user, onLogout, apiStatus }: DashboardProps)
       case 'financial':
         return <FinancialCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       case 'manufacturing':
-        return <ManufacturingCharts chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
+        return <ManufacturingChartsFixed chartOptions={chartOptions} pieChartOptions={pieChartOptions} />;
       case 'manufacturing-bi':
         return <ManufacturingDashboardSimple />;
       case 'predictions':

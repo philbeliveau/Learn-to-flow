@@ -50,8 +50,34 @@ FROM base as production
 # Copy source code
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p /app/logs /app/uploads /app/static && \
+# Create Railway-compatible startup script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+echo "🚀 Starting EZBI Analytics Production Server..."\n\
+mkdir -p /app/logs /app/data\n\
+if [ ! -f /app/data/ezbi_analytics.db ]; then\n\
+    echo "📊 Initializing manufacturing database..."\n\
+    python -c "\n\
+import sys\n\
+sys.path.append(\"/app\")\n\
+try:\n\
+    from app.core.database import init_db\n\
+    init_db()\n\
+    print(\"✅ Database initialized\")\n\
+except Exception as e:\n\
+    print(f\"⚠️ Database initialization info: {e}\")\n\
+" || echo "⚠️ Database initialization skipped (may already exist)"\n\
+fi\n\
+echo "🌟 Starting FastAPI server on port ${PORT:-8000}..."\n\
+exec uvicorn app.main:app \\\n\
+    --host 0.0.0.0 \\\n\
+    --port ${PORT:-8000} \\\n\
+    --workers 2 \\\n\
+    --access-log \\\n\
+    --log-level info' > /app/start.sh && chmod +x /app/start.sh
+
+# Create necessary directories  
+RUN mkdir -p /app/logs /app/uploads /app/static /app/data && \
     chown -R ezbi:ezbi /app
 
 # Switch to non-root user
@@ -65,4 +91,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Command for production
-CMD ["gunicorn", "app.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--access-logfile", "-", "--error-logfile", "-"]
+CMD ["/app/start.sh"]
