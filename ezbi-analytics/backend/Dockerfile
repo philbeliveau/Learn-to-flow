@@ -61,29 +61,24 @@ set -e\n\
 echo "🚀 Starting EZBI Analytics Production Server..."\n\
 mkdir -p /app/logs /app/data /app/backup\n\
 \n\
-# Database Migration Logic\n\
-if [ ! -z "$DATABASE_URL" ] && [[ "$DATABASE_URL" == *"postgres"* ]] && [[ "$DATABASE_URL" != *"postgresql://user:pass@host:5432"* ]]; then\n\
-    echo "📊 Valid PostgreSQL URL detected - running migration..."\n\
-    python /app/railway_migrate.py && echo "✅ PostgreSQL migration completed" || {\n\
-        echo "⚠️ PostgreSQL migration failed, falling back to SQLite"\n\
-        python -c "\n\
-import sys, asyncio\n\
+# Database Initialization - Default to SQLite for now\n\
+echo "📊 Initializing manufacturing database..."\n\
+python -c "\n\
+import sys, asyncio, os\n\
 sys.path.append(\"/app\")\n\
 from app.core.database import init_db\n\
-asyncio.run(init_db())\n\
-" && echo "✅ SQLite fallback initialized"\n\
-    }\n\
-elif [ ! -f /app/data/ezbi_analytics.db ]; then\n\
-    echo "📊 No PostgreSQL available - using SQLite database..."\n\
-    python -c "\n\
-import sys, asyncio\n\
-sys.path.append(\"/app\")\n\
-from app.core.database import init_db\n\
-asyncio.run(init_db())\n\
-" && echo "✅ SQLite database initialized"\n\
-else\n\
-    echo "✅ Using existing SQLite database"\n\
-fi\n\
+from jobs.daily_data_generation import ManufacturingDataGenerator\n\
+async def setup():\n\
+    await init_db()\n\
+    print(\"Database initialized\")\n\
+    if not os.path.exists(\"/app/data/data_generated.flag\"):\n\
+        generator = ManufacturingDataGenerator()\n\
+        await generator.generate_initial_data()\n\
+        with open(\"/app/data/data_generated.flag\", \"w\") as f:\n\
+            f.write(\"initial_data_generated\")\n\
+        print(\"Initial manufacturing data generated\")\n\
+asyncio.run(setup())\n\
+" && echo "✅ Manufacturing database ready with sample data"\n\
 \n\
 # Setup cron jobs\n\
 if [ -f /app/deployment/crontab ]; then\n\
