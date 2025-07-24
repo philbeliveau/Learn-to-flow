@@ -21,10 +21,11 @@ python --version
 python -c "import fastapi; print(f'FastAPI: {fastapi.__version__}')"
 python -c "import uvicorn; print('Uvicorn: OK')"
 
-# Try simple app first
-echo "🌟 Starting simple test FastAPI server..."
-exec uvicorn test_app:app \
+# Start full manufacturing API with database
+echo "🌟 Starting EZBI Analytics Manufacturing API..."
+exec uvicorn app.main:app \
     --host 0.0.0.0 \
     --port ${PORT:-8000} \
-    --workers 1 \
+    --workers 2 \
+    --access-log \
     --log-level info
