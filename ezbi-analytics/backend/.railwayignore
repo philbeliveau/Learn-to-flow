@@ -1,0 +1,20 @@
+# Railway ignore file - only deploy essential files
+app_backup/
+simple_main.py
+simple_app.py
+auth_service.py
+test_*.py
+*.log
+*.db
+data/
+tests/
+docs/
+__pycache__/
+*.pyc
+.git/
+.env*
+alembic/
+migrations/
+scheduler/
+jobs/
+scripts/

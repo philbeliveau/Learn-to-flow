@@ -3,15 +3,23 @@ python = "3.11"
 
 [variables]
 NIXPACKS_PYTHON_VERSION = "3.11"
+NIXPACKS_NO_CACHE = "1"
 
 [phases.setup]
-nixPkgs = ["python311", "sqlite"]
+nixPkgs = ["python311"]
 
 [phases.install]
-cmds = ["pip install -r requirements-minimal.txt"]
+cmds = [
+  "pip install --no-cache-dir -r requirements-minimal.txt",
+  "echo 'Installed packages:' && pip list"
+]
 
 [phases.build]
-cmds = ["mkdir -p data"]
+cmds = [
+  "echo 'Current directory:' && pwd",
+  "echo 'Available files:' && ls -la",
+  "echo 'Python path:' && python -c 'import sys; print(sys.path)'"
+]
 
 [start]
-cmd = "uvicorn main:app --host 0.0.0.0 --port $PORT"
+cmd = "python -c 'import main; print(\"main.py found\")' && uvicorn main:app --host 0.0.0.0 --port $PORT --log-level info"
