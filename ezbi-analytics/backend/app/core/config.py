@@ -137,24 +137,18 @@ class Settings(BaseSettings):
         if isinstance(v, str):
             return v
         
-        # Fallback to component-based construction
-        db_host = os.getenv("DB_HOST", "localhost")
-        db_port = os.getenv("DB_PORT", "5432")
-        db_user = os.getenv("DB_USER", "postgres")
-        db_password = os.getenv("DB_PASSWORD", "password")
-        db_name = os.getenv("DB_NAME", "ezbi_analytics")
-        
-        return f"postgresql+asyncpg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+        # Always use SQLite for Railway deployment
+        return "sqlite+aiosqlite:///app/data/ezbi_analytics.db"
     
     @property
     def async_database_url(self) -> str:
         """Get async database URL."""
-        return self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+        return self.DATABASE_URL
     
     @property
     def sync_database_url(self) -> str:
         """Get sync database URL for migrations."""
-        return self.DATABASE_URL.replace("postgresql+asyncpg://", "postgresql://")
+        return self.DATABASE_URL.replace("sqlite+aiosqlite://", "sqlite://")
     
     class Config:
         env_file = ".env"
