@@ -106,13 +106,15 @@ exec uvicorn app.main:app \\\n\
     --access-log \\\n\
     --log-level info' > /app/start.sh && chmod +x /app/start.sh
 
+# Create necessary directories FIRST
+RUN mkdir -p /app/logs /app/uploads /app/static /app/data
+
 # Copy the manufacturing database BEFORE user switch
 COPY data/ezbi_analytics.db /app/data/ezbi_analytics.db
 RUN ls -la /app/data/ && echo "Database file copied successfully"
 
-# Create necessary directories  
-RUN mkdir -p /app/logs /app/uploads /app/static /app/data && \
-    chown -R ezbi:ezbi /app
+# Set ownership after copying
+RUN chown -R ezbi:ezbi /app
 
 # Switch to non-root user
 USER ezbi
