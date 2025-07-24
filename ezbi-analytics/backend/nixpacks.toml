@@ -20,10 +20,13 @@ cmds = [
 [phases.build]
 cmds = [
   "echo '📁 Current directory:' && pwd",
-  "echo '📄 Available files:' && ls -la main.py requirements-minimal.txt",
-  "echo '🐍 Testing main.py import:' && python -c 'import main; print(\"✅ main.py imports successfully\")'",
+  "echo '📂 All files in directory:' && ls -la",
+  "echo '📄 Checking main.py exists:' && test -f main.py && echo '✅ main.py found' || echo '❌ main.py missing'",
+  "echo '🔍 Python path:' && python -c 'import sys; print(sys.path)'",
+  "echo '🐍 Testing main.py import:' && python -c 'import main; print(\"✅ main.py imports successfully\")' || echo '❌ main.py import failed'",
+  "echo '🎯 Testing uvicorn import:' && python -c 'import uvicorn; print(\"✅ uvicorn available\")' || echo '❌ uvicorn missing'",
   "echo '🚀 Ready for deployment'"
 ]
 
 [start]
-cmd = "echo '🚀 Starting EZBI Analytics API' && uvicorn main:app --host 0.0.0.0 --port $PORT --log-level info"
+cmd = "echo '🚀 Starting EZBI Analytics API' && python -m uvicorn main:app --host 0.0.0.0 --port $PORT --log-level info"
