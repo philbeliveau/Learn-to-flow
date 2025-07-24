@@ -1,25 +1,29 @@
+# Fresh nixpacks config to force cache clear
 [providers]
 python = "3.11"
 
 [variables]
 NIXPACKS_PYTHON_VERSION = "3.11"
-NIXPACKS_NO_CACHE = "1"
+FORCE_REBUILD = "true"
 
 [phases.setup]
 nixPkgs = ["python311"]
 
 [phases.install]
 cmds = [
+  "echo '🔄 CLEARING CACHE - Fresh install'",
+  "pip install --no-cache-dir --upgrade pip",
   "pip install --no-cache-dir -r requirements-minimal.txt",
-  "echo 'Installed packages:' && pip list"
+  "echo '✅ Installed packages:' && pip list | grep -E '(fastapi|uvicorn|psycopg2)'"
 ]
 
 [phases.build]
 cmds = [
-  "echo 'Current directory:' && pwd",
-  "echo 'Available files:' && ls -la",
-  "echo 'Python path:' && python -c 'import sys; print(sys.path)'"
+  "echo '📁 Current directory:' && pwd",
+  "echo '📄 Available files:' && ls -la main.py requirements-minimal.txt",
+  "echo '🐍 Testing main.py import:' && python -c 'import main; print(\"✅ main.py imports successfully\")'",
+  "echo '🚀 Ready for deployment'"
 ]
 
 [start]
-cmd = "python -c 'import main; print(\"main.py found\")' && uvicorn main:app --host 0.0.0.0 --port $PORT --log-level info"
+cmd = "echo '🚀 Starting EZBI Analytics API' && uvicorn main:app --host 0.0.0.0 --port $PORT --log-level info"

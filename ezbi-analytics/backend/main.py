@@ -12,7 +12,7 @@ from psycopg2.extras import RealDictCursor
 app = FastAPI(
     title="EZBI Analytics Manufacturing API",
     description="Manufacturing intelligence platform - Railway deployment",
-    version="1.0.0"
+    version="1.0.1"
 )
 
 # Add CORS for frontend
