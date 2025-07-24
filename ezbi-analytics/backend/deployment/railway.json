@@ -1,11 +1,10 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "DOCKERFILE",
-    "dockerfilePath": "Dockerfile"
+    "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "/app/minimal_start.sh",
+    "startCommand": "uvicorn app.main:app --host 0.0.0.0 --port $PORT",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",
@@ -16,7 +15,7 @@
       "variables": {
         "ENVIRONMENT": "production",
         "LOG_LEVEL": "info",
-        "DATABASE_URL": "sqlite:///app/data/ezbi_analytics.db",
+        "DATABASE_URL": "sqlite:///data/ezbi_analytics.db",
         "CORS_ORIGINS": "https://ezbi-analytics.vercel.app,https://ezbi-analytics-*.vercel.app",
         "RATE_LIMIT_REQUESTS": "1000",
         "RATE_LIMIT_WINDOW": "3600"
