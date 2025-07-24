@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python init_database.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT",
+    "startCommand": "uvicorn app.main:app --host 0.0.0.0 --port $PORT",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",
@@ -15,7 +15,7 @@
       "variables": {
         "ENVIRONMENT": "production",
         "LOG_LEVEL": "info",
-        "DATABASE_URL": "sqlite:///data/ezbi_analytics.db",
+        "DATABASE_URL": "postgresql://postgres:cnaAFVnruvkBnnzxCDxUEkfedixdbCHH@yamanote.proxy.rlwy.net:25571/railway",
         "CORS_ORIGINS": "https://ezbi-analytics.vercel.app,https://ezbi-analytics-*.vercel.app",
         "RATE_LIMIT_REQUESTS": "1000",
         "RATE_LIMIT_WINDOW": "3600"
